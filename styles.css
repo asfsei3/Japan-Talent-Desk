@@ -3,14 +3,16 @@
   --green-900: #0d241c;
   --green-800: #123226;
   --green-700: #1d4435;
+  --green-500: #27c47d;
   --gold-500: #b99a5b;
   --gold-300: #d8c391;
-  --cream-100: #f7f1e6;
-  --cream-200: #ede2cf;
-  --ink: #141512;
-  --muted: #5d625a;
+  --rust-500: #9b5f43;
+  --cream-100: #f7f4ed;
+  --cream-200: #ece5d8;
+  --ink: #101214;
+  --muted: #566068;
   --line: rgba(20, 21, 18, 0.13);
-  --white: #fffaf0;
+  --white: #fffdf8;
   --shadow: 0 20px 60px rgba(7, 26, 20, 0.13);
   color-scheme: light;
   font-family:
@@ -57,7 +59,7 @@ h3 {
   z-index: 10;
   transform: translateY(-150%);
   border-radius: 4px;
-  background: var(--gold-500);
+  background: var(--green-500);
   color: var(--green-950);
   padding: 0.7rem 0.9rem;
   transition: transform 160ms ease;
@@ -89,7 +91,7 @@ h3 {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(180deg, rgba(7, 26, 20, 0.82), rgba(7, 26, 20, 0));
+  background: linear-gradient(180deg, rgba(7, 26, 20, 0.84), rgba(7, 26, 20, 0));
   pointer-events: none;
 }
 
@@ -107,11 +109,12 @@ h3 {
   width: 34px;
   height: 34px;
   place-items: center;
-  border: 1px solid rgba(216, 195, 145, 0.7);
+  border: 1px solid rgba(39, 196, 125, 0.72);
   border-radius: 4px;
-  color: var(--gold-300);
+  color: var(--white);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1rem;
+  background: rgba(17, 107, 73, 0.28);
 }
 
 .site-nav {
@@ -133,7 +136,7 @@ h3 {
 
 .site-nav a:hover,
 .site-nav a:focus-visible {
-  color: var(--gold-300);
+  color: var(--green-500);
   opacity: 1;
 }
 
@@ -173,7 +176,7 @@ h3 {
 }
 
 .eyebrow {
-  color: var(--gold-500);
+  color: var(--green-700);
   font-size: 0.78rem;
   font-weight: 760;
   letter-spacing: 0.18em;
@@ -235,14 +238,14 @@ h1 {
 }
 
 .button-primary {
-  border: 1px solid var(--gold-300);
-  background: var(--gold-500);
+  border: 1px solid rgba(39, 196, 125, 0.75);
+  background: var(--green-500);
   color: var(--green-950);
 }
 
 .button-primary:hover,
 .button-primary:focus-visible {
-  background: var(--gold-300);
+  background: #4dd18f;
 }
 
 .email-link {
@@ -256,7 +259,7 @@ h1 {
 .email-link:focus-visible,
 .contact-email:hover,
 .contact-email:focus-visible {
-  color: var(--gold-500);
+  color: var(--green-500);
 }
 
 .section {
@@ -384,7 +387,7 @@ h2 {
 }
 
 .founder-section .eyebrow {
-  color: var(--gold-300);
+  color: var(--green-500);
 }
 
 .founder-copy {
@@ -440,6 +443,10 @@ h2 {
   background: var(--green-950);
   color: rgba(255, 250, 240, 0.68);
   padding: 24px 0;
+}
+
+.site-footer .footer-content span:first-child {
+  color: rgba(255, 253, 248, 0.9);
 }
 
 .footer-content {

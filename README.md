@@ -1,6 +1,6 @@
-# ScoutAI Trust Page
+# Japan Talent Desk Landing Page
 
-Premium one-page static website for ScoutAI, a Japan export intelligence service for European football clubs.
+Premium one-page static website for Japan Talent Desk, a Japanese market recruitment intelligence service for European football clubs.
 
 ## File Structure
 
@@ -40,7 +40,7 @@ npm start
 
 ## Favicon And Logo Treatment
 
-The current favicon is a restrained ScoutAI monogram using the dark green and champagne palette. For a future brand pass, keep the same direction: a simple monogram or wordmark, no football ball icon, no AI circuit motif, and no startup-style gradient mark.
+The current favicon is a restrained monogram using the dark green and muted gold palette. For a future brand pass, keep the same direction: a simple monogram or wordmark, no football ball icon, no AI circuit motif, and no startup-style gradient mark.
 
 ## Hero Asset
 
