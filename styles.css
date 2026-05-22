@@ -16,7 +16,7 @@
   --shadow: 0 20px 60px rgba(7, 26, 20, 0.13);
   color-scheme: light;
   font-family:
-    "Inter", "SF Pro Text", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+    "Instrument Sans", "Avenir Next", "Helvetica Neue", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
     sans-serif;
 }
 
@@ -98,23 +98,14 @@ h3 {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
-  font-size: 0.93rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  gap: 0;
 }
 
-.brand-mark {
-  display: inline-grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border: 1px solid rgba(39, 196, 125, 0.72);
-  border-radius: 4px;
-  color: var(--white);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1rem;
-  background: rgba(17, 107, 73, 0.28);
+.brand-logo {
+  width: auto;
+  height: 42px;
+  display: block;
+  flex: 0 0 auto;
 }
 
 .site-nav {
@@ -155,7 +146,7 @@ h3 {
   z-index: -3;
   background:
     image-set(
-      url("/assets/scoutai-hero.jpg") 1x
+      url("/assets/jtd-hero.jpg") 1x
     )
     center / cover no-repeat;
   transform: scale(1.02);
@@ -188,8 +179,8 @@ h3 {
 h1,
 h2,
 h3 {
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight: 500;
+  font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  font-weight: 600;
   letter-spacing: 0;
 }
 
@@ -248,6 +239,27 @@ h1 {
   background: #4dd18f;
 }
 
+.button-secondary {
+  border: 1px solid rgba(18, 50, 38, 0.18);
+  background: transparent;
+  color: var(--green-900);
+}
+
+.button-secondary:hover,
+.button-secondary:focus-visible {
+  background: rgba(18, 50, 38, 0.06);
+}
+
+.button-ghost-light {
+  border-color: rgba(255, 250, 240, 0.34);
+  color: rgba(255, 250, 240, 0.94);
+}
+
+.button-ghost-light:hover,
+.button-ghost-light:focus-visible {
+  background: rgba(255, 250, 240, 0.08);
+}
+
 .email-link {
   color: rgba(255, 250, 240, 0.82);
   font-size: 0.98rem;
@@ -282,6 +294,203 @@ h1 {
 
 .sample-layout {
   max-width: 760px;
+}
+
+.sample-panel {
+  margin-top: 2rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 253, 248, 0.9);
+  box-shadow: var(--shadow);
+  padding: clamp(1.35rem, 2.7vw, 2rem);
+}
+
+.sample-panel-label {
+  color: var(--green-800);
+  font-size: 0.8rem;
+  font-weight: 760;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sample-focus-list {
+  margin-top: 1.25rem;
+}
+
+.sample-note,
+.newsletter-note {
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.newsletter-section {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.92), rgba(255, 253, 248, 0.98)),
+    linear-gradient(90deg, rgba(39, 196, 125, 0.05), rgba(185, 154, 91, 0.03));
+}
+
+.archive-preview-section {
+  background:
+    linear-gradient(180deg, rgba(255, 250, 240, 0.98), rgba(247, 244, 237, 1)),
+    var(--cream-100);
+  border-block: 1px solid rgba(20, 21, 18, 0.08);
+}
+
+.archive-preview-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(340px, 0.95fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.archive-preview-panel {
+  display: grid;
+  gap: 1px;
+  border: 1px solid rgba(18, 50, 38, 0.14);
+  background: rgba(18, 50, 38, 0.14);
+  box-shadow: var(--shadow);
+}
+
+.archive-card {
+  background: rgba(255, 253, 248, 0.95);
+  padding: clamp(1.35rem, 2.7vw, 2rem);
+}
+
+.archive-card-label {
+  color: var(--green-800);
+  font-size: 0.8rem;
+  font-weight: 760;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.archive-card h3 {
+  margin-top: 0.8rem;
+  color: var(--green-900);
+  font-size: 1.5rem;
+  line-height: 1.12;
+}
+
+.archive-card p {
+  margin-top: 0.95rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.archive-points {
+  margin: 1rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--green-800);
+}
+
+.archive-points li + li {
+  margin-top: 0.6rem;
+}
+
+.newsletter-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(320px, 0.9fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.newsletter-panel {
+  border: 1px solid var(--line);
+  background: rgba(255, 253, 248, 0.94);
+  box-shadow: var(--shadow);
+  padding: clamp(1.35rem, 2.7vw, 2rem);
+}
+
+.newsletter-panel .focus-list {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.newsletter-cta {
+  color: var(--green-800);
+  font-size: 0.92rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.newsletter-form {
+  margin-top: 1.25rem;
+}
+
+.newsletter-form-label {
+  display: inline-block;
+  color: var(--green-900);
+  font-size: 0.82rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.newsletter-form-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  margin-top: 0.7rem;
+}
+
+.newsletter-form-input {
+  min-height: 50px;
+  width: 100%;
+  border: 1px solid rgba(18, 50, 38, 0.18);
+  background: var(--white);
+  color: var(--ink);
+  padding: 0.9rem 0.95rem;
+  font: inherit;
+}
+
+.newsletter-form-input:focus {
+  outline: 2px solid rgba(39, 196, 125, 0.25);
+  outline-offset: 2px;
+  border-color: rgba(39, 196, 125, 0.55);
+}
+
+.newsletter-form-button {
+  min-width: 174px;
+}
+
+.newsletter-form-button[disabled] {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.newsletter-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.newsletter-form-help,
+.newsletter-form-status {
+  margin-top: 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.newsletter-form-help {
+  color: var(--muted);
+}
+
+.newsletter-form-status {
+  min-height: 1.6em;
+  color: var(--green-800);
+}
+
+.newsletter-form-status[data-state="error"] {
+  color: var(--rust-500);
+}
+
+.newsletter-form-status[data-state="loading"] {
+  color: var(--gold-500);
 }
 
 h2 {
@@ -481,7 +690,9 @@ h2 {
   }
 
   .split,
-  .founder-layout {
+  .founder-layout,
+  .newsletter-layout,
+  .archive-preview-layout {
     grid-template-columns: 1fr;
   }
 
@@ -507,6 +718,10 @@ h2 {
     padding: 16px 14px;
   }
 
+  .brand-logo {
+    height: 34px;
+  }
+
   .hero-content {
     padding: 138px 0 58px;
   }
@@ -521,6 +736,10 @@ h2 {
 
   .button {
     width: 100%;
+  }
+
+  .newsletter-form-row {
+    grid-template-columns: 1fr;
   }
 
   .email-link {

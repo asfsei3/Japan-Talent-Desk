@@ -1,15 +1,25 @@
-# Japan Talent Desk Landing Page
+# Japan Talent Desk Site
 
-Premium one-page static website for Japan Talent Desk, a Japanese market recruitment intelligence service for European football clubs.
+Public-facing static site for Japan Talent Desk, a Japanese market recruitment intelligence service for European football clubs.
 
 ## File Structure
 
 ```text
 .
+├── archive/
+│   └── legacy-fsl/
 ├── assets/
+│   ├── ai-orchestra-logo.png
+│   ├── ai-orchestra-mark.png
 │   ├── favicon.svg
-│   ├── scoutai-hero.jpg
-│   └── scoutai-hero.png
+│   ├── jtd-hero.jpg
+│   └── jtd-hero.png
+├── docs/
+│   ├── README.md
+│   ├── newsletter/
+│   ├── outbound/
+│   ├── reports/
+│   └── strategy/
 ├── index.html
 ├── package.json
 ├── README.md
@@ -38,14 +48,28 @@ npm start
 
 5. Railway will provide `PORT` automatically. The included `server.js` serves only static files.
 
+## Content Boundaries
+
+- Root site files are for the public LP only.
+- `docs/strategy/` is for current JTD positioning and messaging source-of-truth.
+- `docs/outbound/` is for outbound policy, CTA rules, and send workflow notes.
+- `docs/newsletter/` is for Japan Market Weekly process and Brevo-related notes.
+- `docs/reports/` is for sample note structure guidance and report operations.
+- `archive/legacy-fsl/` is for internal method references only. FSL should inform the work, not appear in outward JTD messaging.
+
 ## Favicon And Logo Treatment
 
-The current favicon is a restrained monogram using the dark green and muted gold palette. For a future brand pass, keep the same direction: a simple monogram or wordmark, no football ball icon, no AI circuit motif, and no startup-style gradient mark.
+The site uses the shared AI Orchestra PNG assets for the visible header logo and favicon mark:
+
+- `assets/ai-orchestra-logo.png`
+- `assets/ai-orchestra-mark.png`
+
+Japan Talent Desk remains the outward service name in copy, headings, and newsletter language.
 
 ## Hero Asset
 
 The hero image was generated for this project as a premium editorial football scouting scene. The site uses the optimized JPEG, with the original PNG retained as the source asset.
 
 ```text
-assets/scoutai-hero.jpg
+assets/jtd-hero.jpg
 ```
