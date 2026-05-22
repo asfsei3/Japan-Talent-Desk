@@ -101,11 +101,12 @@ h3 {
   gap: 0;
 }
 
-.brand-logo {
-  width: auto;
-  height: 42px;
-  display: block;
-  flex: 0 0 auto;
+.brand-wordmark {
+  color: var(--white);
+  font-size: 0.93rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .site-nav {
@@ -718,8 +719,8 @@ h2 {
     padding: 16px 14px;
   }
 
-  .brand-logo {
-    height: 34px;
+  .brand-wordmark {
+    font-size: 0.84rem;
   }
 
   .hero-content {

@@ -9,8 +9,6 @@ Public-facing static site for Japan Talent Desk, a Japanese market recruitment i
 ├── archive/
 │   └── legacy-fsl/
 ├── assets/
-│   ├── ai-orchestra-logo.png
-│   ├── ai-orchestra-mark.png
 │   ├── favicon.svg
 │   ├── jtd-hero.jpg
 │   └── jtd-hero.png
@@ -59,10 +57,7 @@ npm start
 
 ## Favicon And Logo Treatment
 
-The site uses the shared AI Orchestra PNG assets for the visible header logo and favicon mark:
-
-- `assets/ai-orchestra-logo.png`
-- `assets/ai-orchestra-mark.png`
+The site currently uses a restrained text-only header and the local `favicon.svg`.
 
 Japan Talent Desk remains the outward service name in copy, headings, and newsletter language.
 

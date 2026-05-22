@@ -4,25 +4,14 @@ Last updated: 2026-05-22
 
 ## Purpose
 
-Keep AI Orchestra and Japan Talent Desk visually connected through one shared parent-brand mark.
+Keep brand usage restrained on the public LP until a cleaner shared identity system is intentionally designed.
 
-## Current shared assets
+## Current public-site rule
 
-- mark only PNG: [ai-orchestra-mark.png](/Users/sei/Desktop/japan-talent-desk/assets/ai-orchestra-mark.png)
-- primary logo PNG: [ai-orchestra-logo.png](/Users/sei/Desktop/japan-talent-desk/assets/ai-orchestra-logo.png)
-
-## Usage rule
-
-Use the shared `AI Orchestra` mark PNG where a reusable icon is needed:
-
-- favicon
-- LP header mark
-- report header mark
-- future outbound visual assets
-
-Use the shared `AI Orchestra` logo PNG as the default visible brand asset.
-
-Use `Japan Talent Desk` as the service wordmark in copy and page titles.
+- Do not use the large AI Orchestra PNG logo on the LP.
+- Do not use the large AI Orchestra PNG logo in fallback report materials.
+- Use `Japan Talent Desk` as the visible wordmark on the public LP.
+- Keep outward brand treatment light until a better shared system is ready.
 
 ## Deployment note
 
