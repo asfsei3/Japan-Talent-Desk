@@ -228,7 +228,13 @@ async function handleNewsletterSignup(request, response) {
 
 createServer((request, response) => {
   if (request.method === "POST" && request.url === "/api/newsletter") {
-    handleNewsletterSignup(request, response);
+    handleNewsletterSignup(request, response).catch((error) => {
+      console.error("Newsletter signup failed unexpectedly:", error);
+      sendJson(response, 500, {
+        ok: false,
+        message: "Newsletter signup failed unexpectedly.",
+      });
+    });
     return;
   }
 
