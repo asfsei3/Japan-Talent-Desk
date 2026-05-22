@@ -1,4 +1,5 @@
 import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
+import { request as httpsRequest } from "node:https";
 import { extname, join, normalize } from "node:path";
 import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
@@ -83,6 +84,53 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function createBrevoContact(payload) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify(payload);
+    const request = httpsRequest(
+      "https://api.brevo.com/v3/contacts",
+      {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "api-key": brevoApiKey,
+          "content-type": "application/json",
+          "content-length": Buffer.byteLength(body),
+        },
+      },
+      (response) => {
+        let raw = "";
+
+        response.on("data", (chunk) => {
+          raw += chunk;
+        });
+
+        response.on("end", () => {
+          let data = null;
+
+          if (raw) {
+            try {
+              data = JSON.parse(raw);
+            } catch {
+              data = raw;
+            }
+          }
+
+          resolve({
+            ok: (response.statusCode || 500) >= 200 && (response.statusCode || 500) < 300,
+            statusCode: response.statusCode || 500,
+            data,
+          });
+        });
+      }
+    );
+
+    request.on("error", reject);
+    request.write(body);
+    request.end();
+  });
+}
+
 async function handleNewsletterSignup(request, response) {
   if (!brevoApiKey || !brevoNewsletterListId) {
     sendJson(response, 503, {
@@ -143,23 +191,18 @@ async function handleNewsletterSignup(request, response) {
       attributes.ROLE = role;
     }
 
-    const brevoResponse = await fetch("https://api.brevo.com/v3/contacts", {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "api-key": brevoApiKey,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        attributes,
-        listIds: [brevoNewsletterListId],
-        updateEnabled: true,
-      }),
+    const brevoResponse = await createBrevoContact({
+      email,
+      attributes,
+      listIds: [brevoNewsletterListId],
+      updateEnabled: true,
     });
 
     if (!brevoResponse.ok) {
-      const brevoError = await brevoResponse.json().catch(() => null);
+      const brevoError =
+        brevoResponse.data && typeof brevoResponse.data === "object"
+          ? brevoResponse.data
+          : null;
       const message =
         brevoError?.message ||
         "Brevo signup failed. Please check the API key and list ID.";
