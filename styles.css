@@ -167,6 +167,30 @@ h3 {
   color: var(--white);
 }
 
+.archive-hero {
+  position: relative;
+  min-height: 72svh;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.archive-hero-content {
+  padding: 148px 0 76px;
+  color: var(--white);
+}
+
+.archive-hero-copy {
+  max-width: 700px;
+}
+
+.archive-hero-overlay {
+  background:
+    linear-gradient(90deg, rgba(7, 26, 20, 0.84) 0%, rgba(7, 26, 20, 0.66) 42%, rgba(7, 26, 20, 0.22) 100%),
+    linear-gradient(0deg, rgba(7, 26, 20, 0.8) 0%, rgba(7, 26, 20, 0.05) 50%);
+}
+
 .eyebrow {
   color: var(--green-700);
   font-size: 0.78rem;
@@ -388,6 +412,94 @@ h1 {
 
 .archive-points li + li {
   margin-top: 0.6rem;
+}
+
+.archive-page-section {
+  background:
+    linear-gradient(180deg, rgba(255, 250, 240, 0.82), rgba(247, 244, 237, 1)),
+    var(--cream-100);
+}
+
+.archive-page-layout,
+.archive-access-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(340px, 0.98fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: start;
+}
+
+.archive-page-intro p,
+.section-copy-single {
+  color: var(--muted);
+  font-size: clamp(1rem, 1.35vw, 1.12rem);
+  line-height: 1.75;
+}
+
+.archive-rule-list,
+.archive-access-list {
+  margin-top: 1.5rem;
+}
+
+.archive-page-panel,
+.archive-access-panel {
+  border: 1px solid rgba(18, 50, 38, 0.14);
+  background: rgba(255, 253, 248, 0.95);
+  box-shadow: var(--shadow);
+}
+
+.archive-entry {
+  padding: clamp(1.35rem, 2.7vw, 2rem);
+}
+
+.archive-entry + .archive-entry {
+  border-top: 1px solid rgba(18, 50, 38, 0.14);
+}
+
+.archive-entry h3 {
+  margin-top: 0.75rem;
+  color: var(--green-900);
+  font-size: clamp(1.55rem, 2.7vw, 2rem);
+  line-height: 1.1;
+}
+
+.archive-entry p {
+  margin-top: 0.9rem;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.archive-entry-meta {
+  color: var(--green-800) !important;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.archive-quote {
+  margin: 1.15rem 0 0;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(185, 154, 91, 0.72);
+  color: var(--green-900);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.archive-access-section {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.92), rgba(255, 253, 248, 0.98)),
+    linear-gradient(90deg, rgba(39, 196, 125, 0.05), rgba(185, 154, 91, 0.03));
+}
+
+.archive-access-panel {
+  padding: clamp(1.35rem, 2.7vw, 2rem);
+}
+
+.archive-access-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.25rem;
 }
 
 .newsletter-layout {
@@ -693,7 +805,9 @@ h2 {
   .split,
   .founder-layout,
   .newsletter-layout,
-  .archive-preview-layout {
+  .archive-preview-layout,
+  .archive-page-layout,
+  .archive-access-layout {
     grid-template-columns: 1fr;
   }
 
@@ -725,6 +839,10 @@ h2 {
 
   .hero-content {
     padding: 138px 0 58px;
+  }
+
+  .archive-hero-content {
+    padding: 132px 0 56px;
   }
 
   h1 {

@@ -19,6 +19,8 @@ Public-facing static site for Japan Talent Desk, a Japanese market recruitment i
 │   ├── reports/
 │   └── strategy/
 ├── index.html
+├── selected-archive/
+│   └── index.html
 ├── package.json
 ├── README.md
 ├── server.js

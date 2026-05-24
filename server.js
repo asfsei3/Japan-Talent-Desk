@@ -50,8 +50,25 @@ const types = {
 
 function resolvePath(urlPath) {
   const cleanPath = normalize(decodeURIComponent(urlPath.split("?")[0])).replace(/^(\.\.[/\\])+/, "");
-  const requestPath = cleanPath === "/" ? "/index.html" : cleanPath;
-  return join(root, requestPath);
+  if (cleanPath === "/") {
+    return join(root, "index.html");
+  }
+
+  const directPath = join(root, cleanPath);
+
+  if (existsSync(directPath) && statSync(directPath).isDirectory()) {
+    return join(directPath, "index.html");
+  }
+
+  if (!extname(directPath)) {
+    const directoryIndexPath = join(root, cleanPath, "index.html");
+
+    if (existsSync(directoryIndexPath)) {
+      return directoryIndexPath;
+    }
+  }
+
+  return directPath;
 }
 
 function sendJson(response, status, payload) {
