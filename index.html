@@ -32,7 +32,6 @@
         <a href="#founder">Founder</a>
         <a href="#sample-focus">Sample Focus</a>
         <a href="#newsletter">Newsletter</a>
-        <a href="#archive-preview">Archive</a>
         <a href="mailto:scout@ai-orchestra.work">Contact</a>
       </nav>
     </header>
@@ -53,8 +52,8 @@
             <a class="button button-primary" href="mailto:scout@ai-orchestra.work">
               Contact for Recruitment Discussions
             </a>
-            <a class="button button-secondary button-ghost-light" href="/selected-archive/">
-              View Selected Archive Preview
+            <a class="button button-secondary button-ghost-light" href="#newsletter">
+              Join Japan Market Weekly
             </a>
             <a class="email-link" href="mailto:scout@ai-orchestra.work">
               scout@ai-orchestra.work
@@ -196,11 +195,10 @@
       <section class="section archive-preview-section" id="archive-preview" aria-labelledby="archive-preview-title">
         <div class="container archive-preview-layout">
           <div class="section-heading compact">
-            <p class="eyebrow">Selected Archive</p>
-            <h2 id="archive-preview-title">A small look at the format, without turning the full archive into the product.</h2>
+            <p class="eyebrow">Selected Archive Preview</p>
+            <h2 id="archive-preview-title">A small preview of the note format. Full archive access can come after registration.</h2>
             <p>
-              Selected previews help club-side readers understand how the note works. Full back issues do not need
-              to be fully public to build trust.
+              This section is here to show how the note reads. It should support registration, not replace it.
             </p>
           </div>
           <div class="archive-preview-panel">
@@ -217,13 +215,12 @@
               </ul>
             </article>
             <article class="archive-card">
-              <p class="archive-card-label">Subscriber Access</p>
-              <h3>Join to receive current issues and selected back issues.</h3>
+              <p class="archive-card-label">Registration First</p>
+              <h3>Join the list first. Selected archive access can follow.</h3>
               <p>
-                Registration is the right place to unlock selected archive visibility without making the full archive
-                public too early.
+                The immediate goal is newsletter registration. Archive access is a later trust layer, not the first conversion step.
               </p>
-              <a class="button button-secondary" href="/selected-archive/">View Selected Archive</a>
+              <a class="button button-secondary" href="#newsletter">Go To Newsletter Registration</a>
             </article>
           </div>
         </div>
@@ -257,56 +254,66 @@
               sending.
             </p>
             <form class="newsletter-form" id="newsletter-form" novalidate>
-              <label class="newsletter-form-label" for="newsletter-first-name">
-                First name
-              </label>
-              <input
-                class="newsletter-form-input"
-                id="newsletter-first-name"
-                name="firstName"
-                type="text"
-                autocomplete="given-name"
-                placeholder="First name"
-              />
-              <label class="newsletter-form-label" for="newsletter-club">
-                Club
-              </label>
-              <input
-                class="newsletter-form-input"
-                id="newsletter-club"
-                name="club"
-                type="text"
-                autocomplete="organization"
-                placeholder="Club name"
-              />
-              <label class="newsletter-form-label" for="newsletter-role">
-                Role
-              </label>
-              <input
-                class="newsletter-form-input"
-                id="newsletter-role"
-                name="role"
-                type="text"
-                autocomplete="organization-title"
-                placeholder="Sporting director, recruitment, analyst, etc."
-              />
-              <label class="newsletter-form-label" for="newsletter-email">
-                Work email
-              </label>
-              <div class="newsletter-form-row">
-                <input
-                  class="newsletter-form-input"
-                  id="newsletter-email"
-                  name="email"
-                  type="email"
-                  inputmode="email"
-                  autocomplete="email"
-                  placeholder="name@club.com"
-                  required
-                />
-                <button class="button button-primary newsletter-form-button" type="submit">
-                  Join the List
-                </button>
+              <div class="newsletter-form-grid">
+                <div class="newsletter-field">
+                  <label class="newsletter-form-label" for="newsletter-first-name">
+                    First name
+                  </label>
+                  <input
+                    class="newsletter-form-input"
+                    id="newsletter-first-name"
+                    name="firstName"
+                    type="text"
+                    autocomplete="given-name"
+                    placeholder="First name"
+                  />
+                </div>
+                <div class="newsletter-field">
+                  <label class="newsletter-form-label" for="newsletter-club">
+                    Club
+                  </label>
+                  <input
+                    class="newsletter-form-input"
+                    id="newsletter-club"
+                    name="club"
+                    type="text"
+                    autocomplete="organization"
+                    placeholder="Club name"
+                  />
+                </div>
+                <div class="newsletter-field newsletter-field-full">
+                  <label class="newsletter-form-label" for="newsletter-role">
+                    Role
+                  </label>
+                  <input
+                    class="newsletter-form-input"
+                    id="newsletter-role"
+                    name="role"
+                    type="text"
+                    autocomplete="organization-title"
+                    placeholder="Sporting director, recruitment, analyst, etc."
+                  />
+                </div>
+                <div class="newsletter-field newsletter-field-full">
+                  <label class="newsletter-form-label" for="newsletter-email">
+                    Work email
+                  </label>
+                  <div class="newsletter-form-row">
+                    <input
+                      class="newsletter-form-input"
+                      id="newsletter-email"
+                      name="email"
+                      type="email"
+                      inputmode="email"
+                      autocomplete="email"
+                      placeholder="name@club.com"
+                      required
+                    />
+                    <button class="button button-primary newsletter-form-button" type="submit">
+                      Join the List
+                    </button>
+                  </div>
+                </div>
               </div>
               <div class="newsletter-honeypot" aria-hidden="true">
                 <label for="newsletter-website">Leave this blank</label>

@@ -533,6 +533,21 @@ h1 {
   margin-top: 1.25rem;
 }
 
+.newsletter-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1rem;
+}
+
+.newsletter-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.newsletter-field-full {
+  grid-column: 1 / -1;
+}
+
 .newsletter-form-label {
   display: inline-block;
   color: var(--green-900);
@@ -546,7 +561,6 @@ h1 {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.85rem;
-  margin-top: 0.7rem;
 }
 
 .newsletter-form-input {
@@ -858,6 +872,10 @@ h2 {
   }
 
   .newsletter-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .newsletter-form-grid {
     grid-template-columns: 1fr;
   }
 
