@@ -195,7 +195,7 @@ h3 {
 }
 
 .hero h1 {
-  max-width: 10ch;
+  max-width: 12ch;
   font-size: clamp(3.2rem, 7vw, 6rem);
   line-height: 0.92;
   text-wrap: balance;
