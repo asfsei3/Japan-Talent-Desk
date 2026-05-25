@@ -47,11 +47,11 @@
               availability questions, and what still needs to be verified before more time is spent.
             </p>
             <div class="hero-actions" aria-label="Primary calls to action">
-              <a class="button button-primary" href="mailto:scout@ai-orchestra.work">
-                Request A Club-Specific Screen
+              <a class="button button-primary" href="mailto:scout@ai-orchestra.work?subject=Club-specific%20screen%20request">
+                Request a screen
               </a>
-              <a class="button button-secondary button-ghost-light" href="#newsletter">
-                Join Japan Market Weekly
+              <a class="text-link-action text-link-light" href="#newsletter">
+                Or join Japan Market Weekly
               </a>
             </div>
             <a class="hero-email" href="mailto:scout@ai-orchestra.work">scout@ai-orchestra.work</a>
@@ -130,7 +130,7 @@
       <section class="section section-muted" id="sample-focus" aria-labelledby="sample-title">
         <div class="container">
           <div class="section-heading section-heading-wide">
-            <p class="eyebrow">Current Sample Focus</p>
+            <p class="eyebrow">Sample Notes</p>
             <h2 id="sample-title">Three role-specific sample note formats, used when a club conversation is live.</h2>
             <p>
               These notes are built to frame one role question with discipline.
@@ -166,15 +166,15 @@
           <div class="founder-panel">
             <p>
               Based in Tokyo and close to the week-to-week context that shapes how Japanese players
-              are actually read inside the market.
+              are read inside the market.
             </p>
             <p>
-              Former football player with long competitive experience in Japan, now focused on keeping
-              recruitment conversations narrow, practical, and properly verified.
+              Former football player with long competitive experience in Japan, now focused on helping
+              clubs keep early recruitment conversations narrow, practical, and properly verified.
             </p>
             <p>
-              The desk is built for clubs that do not need a louder opinion. They need a more reliable
-              first read on whether a role-specific conversation should move forward.
+              The desk is built for clubs that need a calmer first read, not a louder opinion, on
+              whether a role-specific conversation should move forward.
             </p>
             <p class="founder-location">Tokyo, Japan</p>
           </div>
@@ -212,7 +212,7 @@
               <div class="newsletter-form-card">
                 <p class="scope-label">Register for the weekly note</p>
                 <p class="newsletter-form-intro">
-                  Register with your name, club, role, and work email.
+                  Club and work email are required. Name and role help keep the note relevant.
                 </p>
                 <form class="newsletter-form" id="newsletter-form" novalidate>
                   <div class="newsletter-form-grid">
@@ -224,7 +224,7 @@
                         name="firstName"
                         type="text"
                         autocomplete="given-name"
-                        placeholder="First name"
+                        placeholder="First name (optional)"
                       />
                     </div>
                     <div class="newsletter-field">
@@ -236,6 +236,7 @@
                         type="text"
                         autocomplete="organization"
                         placeholder="Club name"
+                        required
                       />
                     </div>
                     <div class="newsletter-field newsletter-field-full">
@@ -246,7 +247,7 @@
                         name="role"
                         type="text"
                         autocomplete="organization-title"
-                        placeholder="Sporting director, recruitment, analyst, etc."
+                        placeholder="Sporting director, recruitment, analyst, etc. (optional)"
                       />
                     </div>
                     <div class="newsletter-field newsletter-field-full">
@@ -265,7 +266,7 @@
                   </div>
                   <div class="newsletter-form-submit">
                     <button class="button button-primary newsletter-form-button" type="submit">
-                      Join the List
+                      Join the list
                     </button>
                   </div>
                   <div class="newsletter-honeypot" aria-hidden="true">
@@ -273,7 +274,7 @@
                     <input id="newsletter-website" name="website" type="text" tabindex="-1" autocomplete="off" />
                   </div>
                   <p class="newsletter-form-help">
-                    Club-side context helps keep the note relevant.
+                    Club-side context helps keep the note relevant and useful.
                   </p>
                   <p class="newsletter-form-status" id="newsletter-form-status" aria-live="polite"></p>
                 </form>
@@ -288,15 +289,15 @@
           <div class="archive-teaser">
             <div class="archive-teaser-copy">
               <p class="eyebrow">Selected Archive</p>
-              <h2 id="archive-teaser-title">A small archive preview for readers who want to understand the note format.</h2>
+              <h2 id="archive-teaser-title">A short archive preview for readers who want to understand the note format.</h2>
               <p>
-                If you want a quick sense of tone and structure, there is a small selected archive preview.
-                Registration comes first. Archive access is a later trust layer.
+                It is there to clarify how the note reads. Registration comes first. Full archive access can
+                follow later.
               </p>
             </div>
             <div class="archive-teaser-actions">
-              <a class="button button-secondary" href="/selected-archive/">View Selected Archive Preview</a>
-              <a class="button button-secondary" href="#newsletter">Go To Newsletter Registration</a>
+              <a class="button button-primary" href="#newsletter">Register for the note</a>
+              <a class="text-link-action" href="/selected-archive/">View archive preview</a>
             </div>
           </div>
         </div>
@@ -353,6 +354,12 @@
           const email = newsletterEmail.value.trim();
           const website = newsletterWebsite.value.trim();
           const submitButton = newsletterForm.querySelector('button[type="submit"]');
+
+          if (!club) {
+            newsletterStatus.textContent = "Please enter your club name.";
+            newsletterStatus.dataset.state = "error";
+            return;
+          }
 
           if (!email) {
             newsletterStatus.textContent = "Please enter your email address.";
