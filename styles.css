@@ -387,6 +387,12 @@ h1 {
   max-width: 680px;
 }
 
+.archive-section-heading h2,
+.newsletter-section-heading h2 {
+  font-size: clamp(1.88rem, 3vw, 2.72rem);
+  line-height: 1.08;
+}
+
 .archive-preview-panel {
   display: grid;
   grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
@@ -550,6 +556,8 @@ h1 {
 .newsletter-form-card {
   max-width: 460px;
   justify-self: end;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(250, 246, 238, 0.98));
 }
 
 .newsletter-panel-copy .focus-list {
@@ -567,9 +575,9 @@ h1 {
 
 .newsletter-form-intro {
   margin-top: 0.9rem;
-  color: var(--muted);
-  font-size: 0.95rem;
-  line-height: 1.68;
+  color: var(--muted-strong);
+  font-size: 0.92rem;
+  line-height: 1.64;
 }
 
 .newsletter-form {
@@ -643,7 +651,7 @@ h1 {
 .newsletter-form-help,
 .newsletter-form-status {
   margin-top: 0.9rem;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   line-height: 1.65;
 }
 
