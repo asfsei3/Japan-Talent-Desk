@@ -193,8 +193,8 @@
       </section>
 
       <section class="section archive-preview-section" id="archive-preview" aria-labelledby="archive-preview-title">
-        <div class="container archive-preview-layout">
-          <div class="section-heading compact">
+        <div class="container archive-preview-stack">
+          <div class="section-heading archive-section-heading">
             <p class="eyebrow">Selected Archive Preview</p>
             <h2 id="archive-preview-title">A small preview of the note format. Full archive access can come after registration.</h2>
             <p>
@@ -227,8 +227,8 @@
       </section>
 
       <section class="section newsletter-section" id="newsletter" aria-labelledby="newsletter-title">
-        <div class="container newsletter-layout">
-          <div class="section-heading compact">
+        <div class="container newsletter-stack">
+          <div class="section-heading newsletter-section-heading">
             <p class="eyebrow">Newsletter</p>
             <h2 id="newsletter-title">Japan Market Weekly by Japan Talent Desk</h2>
             <p>
@@ -240,65 +240,68 @@
             </p>
           </div>
           <div class="newsletter-panel">
-            <ul class="focus-list" aria-label="Japan Market Weekly content">
-              <li>U25 profiles to monitor</li>
-              <li>Role-specific Japan market signals</li>
-              <li>Injury / availability notes</li>
-              <li>Transfer and loan context</li>
-              <li>Youth / national-team signals</li>
-              <li>Japan-side context that may affect recruitment decisions</li>
-            </ul>
-            <p class="newsletter-cta">Receive the weekly Japan market note</p>
-            <p class="newsletter-note">
-              Drafting may be AI-assisted, but every issue is reviewed before
-              sending. Selected archive access can follow registration.
-            </p>
-            <form class="newsletter-form" id="newsletter-form" novalidate>
-              <div class="newsletter-form-grid">
-                <div class="newsletter-field">
-                  <label class="newsletter-form-label" for="newsletter-first-name">
-                    First name
-                  </label>
-                  <input
-                    class="newsletter-form-input"
-                    id="newsletter-first-name"
-                    name="firstName"
-                    type="text"
-                    autocomplete="given-name"
-                    placeholder="First name"
-                  />
-                </div>
-                <div class="newsletter-field">
-                  <label class="newsletter-form-label" for="newsletter-club">
-                    Club
-                  </label>
-                  <input
-                    class="newsletter-form-input"
-                    id="newsletter-club"
-                    name="club"
-                    type="text"
-                    autocomplete="organization"
-                    placeholder="Club name"
-                  />
-                </div>
-                <div class="newsletter-field newsletter-field-full">
-                  <label class="newsletter-form-label" for="newsletter-role">
-                    Role
-                  </label>
-                  <input
-                    class="newsletter-form-input"
-                    id="newsletter-role"
-                    name="role"
-                    type="text"
-                    autocomplete="organization-title"
-                    placeholder="Sporting director, recruitment, analyst, etc."
-                  />
-                </div>
-                <div class="newsletter-field newsletter-field-full">
-                  <label class="newsletter-form-label" for="newsletter-email">
-                    Work email
-                  </label>
-                  <div class="newsletter-form-row">
+            <div class="newsletter-panel-copy">
+              <p class="newsletter-cta">What the note includes</p>
+              <ul class="focus-list" aria-label="Japan Market Weekly content">
+                <li>U25 profiles to monitor</li>
+                <li>Role-specific Japan market signals</li>
+                <li>Injury / availability notes</li>
+                <li>Transfer and loan context</li>
+                <li>Youth / national-team signals</li>
+                <li>Japan-side context that may affect recruitment decisions</li>
+              </ul>
+              <p class="newsletter-note">
+                Drafting may be AI-assisted, but every issue is reviewed before
+                sending. Selected archive access can follow registration.
+              </p>
+            </div>
+            <div class="newsletter-form-card">
+              <p class="newsletter-cta">Receive the weekly Japan market note</p>
+              <form class="newsletter-form" id="newsletter-form" novalidate>
+                <div class="newsletter-form-grid">
+                  <div class="newsletter-field">
+                    <label class="newsletter-form-label" for="newsletter-first-name">
+                      First name
+                    </label>
+                    <input
+                      class="newsletter-form-input"
+                      id="newsletter-first-name"
+                      name="firstName"
+                      type="text"
+                      autocomplete="given-name"
+                      placeholder="First name"
+                    />
+                  </div>
+                  <div class="newsletter-field">
+                    <label class="newsletter-form-label" for="newsletter-club">
+                      Club
+                    </label>
+                    <input
+                      class="newsletter-form-input"
+                      id="newsletter-club"
+                      name="club"
+                      type="text"
+                      autocomplete="organization"
+                      placeholder="Club name"
+                    />
+                  </div>
+                  <div class="newsletter-field newsletter-field-full">
+                    <label class="newsletter-form-label" for="newsletter-role">
+                      Role
+                    </label>
+                    <input
+                      class="newsletter-form-input"
+                      id="newsletter-role"
+                      name="role"
+                      type="text"
+                      autocomplete="organization-title"
+                      placeholder="Sporting director, recruitment, analyst, etc."
+                    />
+                  </div>
+                  <div class="newsletter-field newsletter-field-full">
+                    <label class="newsletter-form-label" for="newsletter-email">
+                      Work email
+                    </label>
                     <input
                       class="newsletter-form-input"
                       id="newsletter-email"
@@ -309,21 +312,23 @@
                       placeholder="name@club.com"
                       required
                     />
-                    <button class="button button-primary newsletter-form-button" type="submit">
-                      Join the List
-                    </button>
                   </div>
                 </div>
-              </div>
-              <div class="newsletter-honeypot" aria-hidden="true">
-                <label for="newsletter-website">Leave this blank</label>
-                <input id="newsletter-website" name="website" type="text" tabindex="-1" autocomplete="off" />
-              </div>
-              <p class="newsletter-form-help">
-                We ask for club-side context so the note stays relevant and selected archive access can stay targeted.
-              </p>
-              <p class="newsletter-form-status" id="newsletter-form-status" aria-live="polite"></p>
-            </form>
+                <div class="newsletter-form-submit">
+                  <button class="button button-primary newsletter-form-button" type="submit">
+                    Join the List
+                  </button>
+                </div>
+                <div class="newsletter-honeypot" aria-hidden="true">
+                  <label for="newsletter-website">Leave this blank</label>
+                  <input id="newsletter-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+                </div>
+                <p class="newsletter-form-help">
+                  We ask for club-side context so the note stays relevant and selected archive access can stay targeted.
+                </p>
+                <p class="newsletter-form-status" id="newsletter-form-status" aria-live="polite"></p>
+              </form>
+            </div>
           </div>
         </div>
       </section>

@@ -376,23 +376,27 @@ h1 {
   border-block: 1px solid rgba(20, 21, 18, 0.08);
 }
 
-.archive-preview-layout {
+.archive-preview-stack,
+.newsletter-stack {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(360px, 0.9fr);
-  gap: clamp(1.5rem, 5vw, 4rem);
-  align-items: start;
+  gap: clamp(2rem, 4vw, 3rem);
+}
+
+.archive-section-heading,
+.newsletter-section-heading {
+  max-width: 760px;
 }
 
 .archive-preview-panel {
   display: grid;
-  gap: 1px;
-  border: 1px solid rgba(18, 50, 38, 0.14);
-  background: rgba(18, 50, 38, 0.14);
-  box-shadow: var(--shadow);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
 }
 
 .archive-card {
   background: rgba(255, 253, 248, 0.95);
+  border: 1px solid rgba(18, 50, 38, 0.12);
+  box-shadow: var(--shadow-soft);
   padding: clamp(1.5rem, 2.8vw, 2.15rem);
 }
 
@@ -517,23 +521,24 @@ h1 {
   margin-top: 1.25rem;
 }
 
-.newsletter-layout {
+.newsletter-panel {
   display: grid;
-  grid-template-columns: minmax(0, 0.98fr) minmax(360px, 0.88fr);
-  gap: clamp(1.5rem, 5vw, 4rem);
+  grid-template-columns: minmax(0, 1.04fr) minmax(340px, 0.96fr);
+  gap: clamp(1.4rem, 3vw, 2.1rem);
   align-items: start;
 }
 
-.newsletter-panel {
+.newsletter-panel-copy,
+.newsletter-form-card {
   border: 1px solid var(--line);
   background: rgba(255, 253, 248, 0.94);
   box-shadow: var(--shadow-soft);
   padding: clamp(1.6rem, 2.9vw, 2.3rem);
 }
 
-.newsletter-panel .focus-list {
-  margin-top: 0;
-  margin-bottom: 1.65rem;
+.newsletter-panel-copy .focus-list {
+  margin-top: 1.25rem;
+  margin-bottom: 0;
 }
 
 .newsletter-cta {
@@ -545,7 +550,7 @@ h1 {
 }
 
 .newsletter-form {
-  margin-top: 1.35rem;
+  margin-top: 1.1rem;
 }
 
 .newsletter-form-grid {
@@ -572,12 +577,6 @@ h1 {
   text-transform: uppercase;
 }
 
-.newsletter-form-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.85rem;
-}
-
 .newsletter-form-input {
   min-height: 54px;
   width: 100%;
@@ -596,7 +595,11 @@ h1 {
 }
 
 .newsletter-form-button {
-  min-width: 174px;
+  min-width: 190px;
+}
+
+.newsletter-form-submit {
+  margin-top: 1.15rem;
 }
 
 .newsletter-form-button[disabled] {
@@ -840,10 +843,13 @@ h2 {
 
   .split,
   .founder-layout,
-  .newsletter-layout,
-  .archive-preview-layout,
   .archive-page-layout,
   .archive-access-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-preview-panel,
+  .newsletter-panel {
     grid-template-columns: 1fr;
   }
 
@@ -883,10 +889,6 @@ h2 {
 
   .button {
     width: 100%;
-  }
-
-  .newsletter-form-row {
-    grid-template-columns: 1fr;
   }
 
   .newsletter-form-grid {
