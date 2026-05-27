@@ -357,7 +357,7 @@ section[id] {
 }
 
 .section-header h2 {
-  max-width: 17.5ch;
+  max-width: 21ch;
   font-size: clamp(2rem, 3.15vw, 3rem);
   line-height: 0.98;
 }
@@ -492,7 +492,7 @@ section[id] {
 
 .founder-heading h2,
 .contact-copy-block h2 {
-  max-width: 15ch;
+  max-width: 17ch;
   margin-top: 0.7rem;
   font-size: clamp(2rem, 3.15vw, 3rem);
   line-height: 0.98;
@@ -653,7 +653,7 @@ section[id] {
 }
 
 .archive-copy h2 {
-  max-width: 21ch;
+  max-width: 23ch;
   margin-top: 0.7rem;
   font-size: clamp(1.72rem, 2.45vw, 2.36rem);
   line-height: 1.06;
@@ -742,7 +742,7 @@ section[id] {
 }
 
 .archive-intro h2 {
-  max-width: 20ch;
+  max-width: 22ch;
   margin-top: 0.7rem;
   font-size: clamp(1.9rem, 3vw, 2.65rem);
   line-height: 1.04;
@@ -880,7 +880,7 @@ section[id] {
   .contact-copy-block h2,
   .archive-copy h2,
   .archive-intro h2 {
-    max-width: 15.5ch;
+    max-width: 18ch;
     font-size: clamp(1.82rem, 8vw, 2.28rem);
     line-height: 0.98;
   }
