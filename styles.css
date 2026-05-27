@@ -18,7 +18,7 @@
   --shadow-deep: 0 28px 58px rgba(8, 24, 16, 0.12);
   color-scheme: light;
   font-family:
-    "Inter", "Avenir Next", "Helvetica Neue", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+    "Instrument Sans", "Avenir Next", "Helvetica Neue", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
     sans-serif;
 }
 
@@ -63,7 +63,7 @@ p {
 h1,
 h2,
 h3 {
-  font-family: "Quattrocento", Georgia, "Times New Roman", serif;
+  font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -124,10 +124,10 @@ h3 {
   display: flex;
   align-items: center;
   gap: clamp(0.9rem, 2vw, 1.65rem);
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: none;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .site-nav a {
@@ -191,13 +191,13 @@ h3 {
 }
 
 .hero-copy-block {
-  max-width: 780px;
+  max-width: 720px;
 }
 
 .hero h1 {
-  max-width: 16.5ch;
-  font-size: clamp(2.75rem, 5.5vw, 4.7rem);
-  line-height: 0.94;
+  max-width: 12.25ch;
+  font-size: clamp(3rem, 6.2vw, 5.5rem);
+  line-height: 0.91;
   text-wrap: balance;
 }
 
@@ -272,10 +272,10 @@ h3 {
   justify-content: center;
   padding: 0.92rem 1.18rem;
   border-radius: 4px;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 760;
-  letter-spacing: 0.04em;
-  text-transform: none;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
   transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
@@ -955,8 +955,37 @@ h3 {
   }
 
   .hero h1 {
-    font-size: clamp(2.15rem, 11vw, 3.35rem);
-    max-width: 14.5ch;
+    font-size: clamp(2.18rem, 10.6vw, 3.12rem);
+    max-width: 11.4ch;
+  }
+
+  .section-heading h2 {
+    max-width: 12.5ch;
+    font-size: clamp(1.86rem, 8.8vw, 2.34rem);
+    line-height: 0.99;
+  }
+
+  .section-heading p,
+  .lead-paragraph {
+    font-size: 0.98rem;
+    line-height: 1.72;
+  }
+
+  .thesis-item h2 {
+    font-size: 1.55rem;
+    line-height: 1.03;
+  }
+
+  .sample-card h3 {
+    font-size: 1.44rem;
+    line-height: 1.1;
+  }
+
+  .archive-teaser-copy h2,
+  .archive-intro h2 {
+    max-width: 13ch;
+    font-size: clamp(1.72rem, 8vw, 2.16rem);
+    line-height: 1.03;
   }
 
   .button,
