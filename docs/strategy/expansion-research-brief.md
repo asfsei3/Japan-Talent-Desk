@@ -14,8 +14,8 @@ Do not treat any hypothesis in this file as source-of-truth positioning.
 1. Reorient the Japan-side intelligence layer from European clubs to Asian markets.
 2. Work the reverse flow: Asian players into J.League partner-country and Asian quota slots.
 3. Multilingual Japanese football media aimed at Asia first, not Europe.
-4. No-inventory cross-border commerce for J.League merchandise, including
-   flea-market-app sourcing.
+4. Cross-border commerce in Japanese football shirts, now narrowed to vintage stock
+   sourced domestically and sold to overseas collectors.
 
 ## Initial internal read
 
@@ -25,13 +25,41 @@ context into practical decision support. The customer changes, the method does n
 The media idea is a distribution question, not a product question. Its value depends
 on whether it feeds a paying B2B customer.
 
-The commerce idea uses none of the existing asset. It carries licensing, trademark,
+The commerce idea uses little of the existing asset. It carries licensing, trademark,
 and platform-terms exposure, and it should be tested under a separate brand so that
 a merchandise dispute cannot touch the credibility of the intelligence work.
 
-Known constraint to verify rather than assume: Japanese flea-market platforms
-generally prohibit listing items the seller does not hold. Research prompt 3 is
-written to surface the exact clauses.
+## Settled points on the commerce idea
+
+These were resolved on 2026-08-02 and no longer need research.
+
+Demand for vintage Japanese shirts is real and documented. Japan is among the
+fastest-growing categories in the international vintage shirt market, 1998 national
+team shirts clear roughly USD 72 to 499 on eBay, and every major vintage retailer
+runs a standing Japan category. Timing caveat: observations taken now sit just after
+the 2026 World Cup, so current prices carry a tournament premium that will decay.
+
+No-inventory does not work for this category. Vintage stock is one-of-a-kind, so the
+premise of restocking after a sale does not hold. The model has to be buy-first.
+
+Platform terms, stated precisely. Listing goods you do not hold is prohibited on
+Mercari, as is shipping to the buyer directly from another store. Sourcing on Mercari
+and shipping the item yourself from your own stock falls outside that prohibition and
+is fine. Listing on eBay and having a third-party retailer ship is a separate eBay
+policy problem. Buy-first clears all three.
+
+A second-hand dealer licence is required to source used goods domestically for resale.
+Roughly JPY 19,000 and about 40 days. Operating without one carries up to three years
+imprisonment or a JPY 1,000,000 fine.
+
+The open question is therefore not demand. It is whether an arbitrage gap still exists
+between Japanese domestic resale prices and overseas realised prices, given that
+specialist buyers already work this market, and whether the per-item labour cost of a
+one-of-a-kind category leaves anything worth having.
+
+The one point of genuine advantage is narrative. These shirts sell on story, and the
+Japan-side story is what domestic sellers do not write in English and what overseas
+retailers do not hold. That is the same asset the intelligence work is built on.
 
 ## Sequencing
 
@@ -237,6 +265,107 @@ E. アフィリエイト（既存代行サービスへの送客のみ）
 - 楽観的な情報商材系ソースは根拠として採用せず、
   必要なら「そう主張する情報源が存在する」という事実として区別して扱う
 ```
+
+## Research prompt 3B: vintage shirt arbitrage (supersedes prompt 3)
+
+Prompt 3 above was written for new licensed merchandise. The idea has since narrowed
+to sourcing vintage Japanese shirts domestically and selling them overseas, which is a
+different business with different constraints. Run this instead. Keep prompt 3 only if
+the new-merchandise route is revisited.
+
+```text
+あなたは、ヴィンテージ・アパレルの二次流通とコレクター市場に精通した
+トップティアのマーケットアナリストです。以下の意思決定のための徹底調査を行ってください。
+
+【意思決定内容】
+日本国内（メルカリ、ヤフオク、実店舗の古着屋、リサイクルショップ）で
+90年代〜2000年代のJリーグおよび日本代表のサッカーユニフォームを仕入れ、
+海外のコレクターに向けて販売する事業が、経済的に成立するかを判断したい。
+需要の有無は既に確認済みなので、調査の焦点は「裁定幅がまだ残っているか」
+「誰が既にこれをやっているか」「1着あたりの実質利益と所要時間」に置くこと。
+
+【最重要：価格ギャップの実測】
+以下のカテゴリについて、日本国内の直近成約価格と、海外での落札済み価格を
+可能な限り同一条件（年代・クラブ・状態・サイズ・選手名入りか否か）で対比した表を作ること。
+- 90年代Jリーグ創設期のクラブ（ヴェルディ川崎、横浜フリューゲルス、
+  名古屋グランパスエイト、ジェフ市原、清水エスパルス等）
+- 消滅・改称したクラブのユニフォーム
+- 日本代表 1996アトランタ、1998フランス、1999、2000、2002日韓
+- アシックス期／プーマ期／アディダス期のデザイン別の評価差
+- 選手名入り（中田英寿、三浦知良、名波浩、小野伸二等）のプレミアム幅
+海外側の参照先は eBay の Sold listings、Vinted、Depop、
+および Classic Football Shirts / Cult Kits / Classic11 / Vintage Football Shirts
+の実売価格とする。
+「出品価格」ではなく「成約価格」を使うこと。ここを混同した分析は無価値。
+
+【供給サイドの調査】
+- 日本国内でこれらのユニフォームが実際にどこに滞留しているか
+  （フリマアプリ、リサイクルショップ、古着チェーン、地方のスポーツ用品店の死蔵在庫）
+- 国内の相場が過去3〜5年でどう動いたか。海外相場を織り込んで上昇しているか
+- 供給量の実勢（月あたり何点程度が国内市場に出てくるか、判明する範囲で）
+- 真贋の問題：90年代日本製ユニのレプリカ・コピー品の流通状況と見分け方
+
+【競合調査】
+- 日本からヴィンテージ・サッカーユニフォームを海外に販売している事業者を実名で列挙
+  （Footuni Japan など日本発ショップ、eBayの大口日本人セラー、Instagram/Depopの個人セラー）
+  それぞれの規模、価格帯、出品点数、販売手法、英語コンテンツの質を評価
+- 海外の大手ヴィンテージ・リテーラーが日本のストックをどう調達しているか
+  （買い付け出張、国内バイヤーとの提携、個人からの直接買取）
+- 既存プレイヤーの弱点、特に「日本側の文脈を英語で語れているか」の観点で評価
+
+【ユニットエコノミクスの実測】
+1着あたりの以下を実数で積み上げること：
+- 国内仕入れ価格の中央値（状態別）
+- 海外実売価格の中央値
+- 販売プラットフォーム手数料（eBay、Vinted、Depop、自社Shopifyの比較）
+- 国際送料（衣類1点、複数点まとめ、追跡あり／なしの各パターン）
+- 決済・為替手数料
+- 返品率とクレーム率の業界実勢
+- 1着あたりの所要作業時間（探索・真贋確認・採寸・撮影・説明文作成・梱包・発送）
+これらから、1着あたりの純利益額と、時給換算の実質報酬を算出すること。
+
+【ナラティブによる差別化の検証】
+- ヴィンテージ・ユニ市場において、商品説明の質・ストーリーテリングが
+  落札価格に与える影響を示すデータや事例があるか
+- 「文脈つきキュレーション」で成功したヴィンテージ・アパレル事業者の事例
+  （サッカー以外でもよい）と、その収益構造
+- コレクター向けニュースレター／SNSを起点にした販売モデルの成立条件
+
+【リスク】
+- 2026年ワールドカップ直後という時期が、現在の代表ユニ相場をどれだけ押し上げているか。
+  過去の大会（2018、2022）の前後で相場がどう推移したかを示し、
+  現在の観測値から差し引くべき「大会プレミアム」を推定すること
+- クラブエンブレム・選手名を含む中古品の再販における商標法上の扱い
+  （中古品の再販は商標権が消尽するという理解でよいか、例外があるか）
+- 在庫の陳腐化リスク（売れ残った場合の値下がり実績）
+
+【出力形式】
+1. エグゼクティブサマリー（「裁定幅は残っているか」に一言で答える）
+2. 価格ギャップ対比表（カテゴリ別・実数・出典つき）
+3. 競合マップ（実名・規模・価格帯・英語コンテンツの質・弱点）
+4. ユニットエコノミクス積み上げ表と時給換算
+5. 大会プレミアムの推定と、平常時に戻った場合の再試算
+6. 反証パート：この事業をやるべきでない理由の最強論拠3つ
+7. 最初に仕入れるべき10着の具体的な条件（年代・クラブ・状態・想定仕入れ上限額）
+
+【必須ルール】
+- 「出品価格」ではなく「成約価格・落札価格」を使う。この区別を必ず明示する
+- 全数値に出典URLを付し、観測日を明記する
+- 推定には「推定」と明記する
+- 情報商材系の「転売で稼げる」ソースは根拠に採用しない
+- 楽観バイアスを排し、裁定幅が既に消えている可能性を正面から検討する
+```
+
+## Immediate next step on the commerce idea
+
+Before any capital is committed, one check settles most of it: take 30 shirts from the
+90s J.League and national team era and match Japanese completed sale prices against
+eBay sold listings one for one. It costs nothing and it can be done today. If the gap
+is gone net of fees and shipping, the idea stops there.
+
+If the gap holds, apply for the second-hand dealer licence, buy ten shirts, and measure
+days-to-sale rather than margin. Write the listings with the Japan-side story in English
+from the first item, so the differentiation is being tested at the same time.
 
 ## After the research returns
 
