@@ -103,6 +103,35 @@ is to split sourcing by price: flea-market apps below JPY 10,000, auction sites 
 physical dealers above it. Auction sites disclose the counterparty, and the better
 pieces surface there anyway.
 
+### The spread that matters is the channel, not the sourcing
+
+Second observation, same day. A 1998 Japan home shirt, asics, Nakata #8, JASPO L,
+near-mint, listed domestically at JPY 14,100 including shipping.
+
+The comparables split by where the shirt is sold, not by what it is:
+
+- Grailed, peer to peer, graded 9/10 — sold at USD 165
+- Classic Football Shirts, graded 8/10 — USD 629.99, out of stock
+- Classic Football Shirts, graded 10/10 — USD 699.99, out of stock
+
+The same shirt carries a 4x range depending on the seller, and both specialist
+listings cleared at the top of it. The sourcing spread from JPY 14,100 to USD 165 is
+real but it is the smaller of the two. The larger one sits between being a peer seller
+and being a seller whose authentication, grading, and written context a collector
+trusts.
+
+That reframes the trade. Volume is the wrong lever. The return is higher in raising
+realised price per item from USD 165 toward USD 350 than in moving more units, and the
+thing that raises it is exactly the core asset — explaining, in English, why the
+tone-on-tone flame jacquard is the mark reproductions miss, why 1998 was the first
+appearance, why the number 8 carries what it carries.
+
+The vintage trade and the intelligence work turn out to run on the same skill. That is
+a stronger link between the two revenue lines than the plan originally assumed.
+
+Practical consequence: revise the Day 31-90 target away from unit count toward realised
+price per item, and treat the written listing as the deliverable being tested.
+
 ### Caveat carried forward
 
 Every price observation was taken immediately after the 2026 World Cup and carries a
