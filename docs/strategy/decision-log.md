@@ -79,6 +79,30 @@ https://claude.ai/code/artifact/b9092bbf-e660-41e8-a7b5-16ec13c2633b
 - Day 91–180, spend JPY 150,000. First commissioned study, JPY 300k–1M.
 - Year one: JPY 2.2M conservative, JPY 4.8M mid, JPY 7.4M upside.
 
+### First real price observation, 2026-08-02
+
+A Mizuno Yomiuri Nippon FC Verdy track jacket, deadstock with the J.League hang tag
+still attached, listed domestically at JPY 18,000. The comparable Tokyo Verdy 1994-95
+Mizuno track jacket sold overseas at USD 272, and a 1993-95 away shirt in new-in-box
+condition at USD 285.99, against USD 105 for the same club's worn shirt.
+
+That is roughly a 2.3x spread, and it answers the open question in the research brief:
+the arbitrage gap has not been closed by the specialist buyers. Two premiums stack and
+both are real — track jackets over match shirts, because they sell into vintage fashion
+rather than football memorabilia, and deadstock over worn.
+
+Authenticity on that piece is not in doubt. The Mizuno product code format, the colour
+named 読売日本SCモデル, the JAN prefix, the JASPO body-measurement notation, the BRABER
+fabric hang tag, and Japanese manufacture all match the period. More to the point, no
+counterfeit market exists for a 1993 domestic club garment that moves a few units a
+year — forgery follows volume, currency, and global recognition, and this has none.
+
+It was still passed on, because JPY 18,000 crosses the verification threshold and the
+duty cannot be satisfied through anonymous flea-market shipping. The correct response
+is to split sourcing by price: flea-market apps below JPY 10,000, auction sites and
+physical dealers above it. Auction sites disclose the counterparty, and the better
+pieces surface there anyway.
+
 ### Caveat carried forward
 
 Every price observation was taken immediately after the 2026 World Cup and carries a
