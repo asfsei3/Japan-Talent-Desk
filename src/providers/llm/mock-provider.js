@@ -68,6 +68,9 @@ function readArticle(prompt) {
     clubs: extractList(prompt, "clubs"),
     tracked: extractList(prompt, "tracked"),
     currentClubs: extractList(prompt, "current"),
+    playersJa: extractList(prompt, "players_ja"),
+    clubsJa: extractList(prompt, "clubs_ja"),
+    sourceName: (/<source[^>]*name="([^"]*)"/.exec(prompt) ?? [])[1] ?? "",
   };
 }
 
@@ -104,6 +107,36 @@ function supportingSentence(article, needle) {
   const sentences = article.text.split(/(?<=[.!?。])\s+/).filter(Boolean);
   const found = sentences.find((sentence) => normalize(sentence).includes(normalize(needle)));
   return found ?? sentences[0] ?? article.title;
+}
+
+/**
+ * Japanese output templates.
+ *
+ * These produce a short factual summary of the EXTRACTED FACTS — never a
+ * translation of the source article, which is what keeps the copyright position
+ * defensible. Every template is hedged (〜と報じられている / 要確認); none of the
+ * banned certainty phrasings (移籍確実, 掘り出し物, 完全にフィット) can be produced.
+ */
+const JA_TEMPLATES = {
+  "transfer:interest": ({ player, club }) => `${player}に${club ?? "欧州クラブ"}が関心と報じられている`,
+  "transfer:bid": ({ player, club }) => `${club ?? "獲得候補クラブ"}が${player}へオファーと報じられている`,
+  "transfer:agreement": ({ player, club }) => `${player}と${club ?? "移籍先候補"}の合意が報じられている`,
+  "transfer:completed": ({ player, club }) => `${player}の${club ?? "新クラブ"}への移籍が報じられている`,
+  "contract:renewal": ({ player }) => `${player}の契約延長が報じられている`,
+  "contract:expiry": ({ player }) => `${player}の契約満了が報じられている`,
+  "injury:out": ({ player }) => `${player}の負傷・離脱が報じられている`,
+  "injury:return": ({ player }) => `${player}の復帰が報じられている`,
+  "performance:goal": ({ player }) => `${player}の直近の出場・得点が報じられている`,
+  "national_team:call_up": ({ player }) => `${player}の代表関連の動きが報じられている`,
+  "commercial:sponsorship": ({ player }) => `${player}のスポンサー関連の動きが報じられている`,
+  "club_situation:manager": ({ club }) => `${club ?? "クラブ"}の監督人事が報じられている`,
+  "media:feature": ({ player }) => `${player}に関する記事が公開された`,
+};
+
+/** Japanese name when the prompt supplied one, else the Latin name. */
+function japaneseName(article, name, list, jaList) {
+  const index = list.findIndex((entry) => normalize(entry) === normalize(name ?? ""));
+  return (index >= 0 && jaList[index]) || name || null;
 }
 
 function importanceFor(article, rule, players, clubs) {
@@ -190,6 +223,11 @@ function extractResponse(article, { upgradeConfidence = false } = {}) {
   const base = selfConfidence(article);
   const upgraded = upgradeConfidence && base === "low" ? "medium" : base;
 
+  const playerJa = japaneseName(article, players[0], article.players, article.playersJa) ?? "対象選手";
+  const clubJa = japaneseName(article, toClub ?? club, article.clubs, article.clubsJa);
+  const template = JA_TEMPLATES[`${rule.type}:${rule.subtype}`] ?? (() => `${playerJa}に関する情報が更新された`);
+  const headlineJa = template({ player: playerJa, club: clubJa });
+
   return {
     event: {
       type: rule.type,
@@ -200,6 +238,8 @@ function extractResponse(article, { upgradeConfidence = false } = {}) {
       to_club: toClub,
       headline: article.title,
       summary: article.excerpt || article.title,
+      headline_ja: headlineJa,
+      summary_ja: `${headlineJa}。情報源: ${article.sourceName || "未指定"}。契約状況および移籍可能性は直接確認が必要。`,
       occurred_at: null,
       completed_action: rule.subtype === "completed" || hasKeyword(article, "official"),
       importance: importanceFor(article, rule, players, clubs),

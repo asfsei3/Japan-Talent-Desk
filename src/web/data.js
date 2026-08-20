@@ -92,8 +92,9 @@ const PLAYER_COLUMNS = `
   p.birth_date, p.nationality, p.contract_until, p.contract_confidence,
   p.national_team, p.national_team_caps, p.market_value_eur, p.market_value_source,
   p.data_status, p.notes,
-  c.name_en AS club_name, c.slug AS club_slug,
-  l.name_en AS league_name, l.slug AS league_slug, l.jp_visibility AS league_jp_visibility,
+  c.name_en AS club_name, c.name_ja AS club_name_ja, c.slug AS club_slug,
+  l.name_en AS league_name, l.name_ja AS league_name_ja, l.slug AS league_slug,
+  l.jp_visibility AS league_jp_visibility,
   ts.score AS transfer_score, ts.band AS transfer_band, ts.coverage AS transfer_coverage,
   jm.score AS japan_score, jm.band AS japan_band, jm.coverage AS japan_coverage`;
 
@@ -165,7 +166,8 @@ export function listPositions() {
 /** Recent events for a player, used when the intelligence module has no dossier. */
 export function listPlayerEvents(playerId, limit = 40) {
   return queryAll(
-    `SELECT id, type, subtype, headline, summary, occurred_at, detected_at, confidence,
+    `SELECT id, type, subtype, headline, summary, headline_ja, summary_ja,
+            occurred_at, detected_at, confidence,
             importance, source_count, independent_source_count, best_source_tier
        FROM events
       WHERE player_id = ? AND status = 'active'
@@ -190,8 +192,54 @@ export function listPlayerSources(playerId, limit = 60) {
   );
 }
 
+/** Recent recorded changes for the players of one league — the league page's utility. */
+export function listLeagueChanges(leagueId, limit = 12) {
+  return queryAll(
+    `SELECT ch.id, ch.change_type, ch.headline, ch.detail, ch.importance, ch.confidence,
+            ch.headline_ja, ch.detail_ja, ch.as_of_date, ch.detected_at,
+            ch.before_value, ch.after_value,
+            p.slug AS player_slug, p.name_en AS player_name, p.name_ja AS player_name_ja, p.position
+       FROM changes ch
+       JOIN players p ON p.id = ch.entity_id AND ch.entity_type = 'player'
+      WHERE p.league_id = ?
+      ORDER BY ch.as_of_date DESC, ch.importance DESC
+      LIMIT ?`,
+    Number(leagueId),
+    Number(limit)
+  );
+}
+
+export function listChangesForDate(asOfDate, limit = 60) {
+  return queryAll(
+    `SELECT ch.id, ch.change_type, ch.headline, ch.detail, ch.importance, ch.confidence,
+            ch.headline_ja, ch.detail_ja, ch.as_of_date, ch.detected_at,
+            ch.before_value, ch.after_value,
+            p.slug AS player_slug, p.name_en AS player_name, p.name_ja AS player_name_ja
+       FROM changes ch
+       LEFT JOIN players p ON p.id = ch.entity_id AND ch.entity_type = 'player'
+      WHERE ch.as_of_date = ?
+      ORDER BY ch.importance DESC, ch.detected_at DESC
+      LIMIT ?`,
+    String(asOfDate),
+    Number(limit)
+  );
+}
+
+/** Enabled sources, for the provenance strip on the dashboard. */
+export function listEnabledSources(limit = 24) {
+  return queryAll(
+    `SELECT slug, name, kind, tier, homepage, language, last_status, last_fetched_at
+       FROM sources WHERE enabled = 1
+      ORDER BY tier, name LIMIT ?`,
+    Number(limit)
+  );
+}
+
 export default {
   getIntelligence,
+  listEnabledSources,
+  listLeagueChanges,
+  listChangesForDate,
   schemaReady,
   queryAll,
   queryOne,

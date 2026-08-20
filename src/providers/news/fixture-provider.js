@@ -58,6 +58,26 @@ function normaliseItem(source, item, sourceSlug, language) {
   };
 }
 
+/**
+ * Fixture publish dates are fixed in the files, but the collector honours
+ * `config.collect.lookbackDays`. Without this the fixtures would silently age
+ * out of the window and every offline demo and test would start collecting
+ * nothing. The whole set is shifted so the newest item lands at "now", which
+ * preserves the relative ordering and spacing the fixtures encode.
+ */
+export function shiftIntoLookbackWindow(items, now = Date.now()) {
+  const stamps = items.map((item) => (item.publishedAt ? Date.parse(item.publishedAt) : NaN)).filter(Number.isFinite);
+  if (!stamps.length) return items;
+
+  const offset = now - Math.max(...stamps);
+  for (const item of items) {
+    if (!item.publishedAt) continue;
+    const stamp = Date.parse(item.publishedAt);
+    if (Number.isFinite(stamp)) item.publishedAt = new Date(stamp + offset).toISOString();
+  }
+  return items;
+}
+
 export async function fetchItems(source) {
   const files = resolveFixtureFiles(source?.feed_url);
   const items = [];
@@ -91,6 +111,8 @@ export async function fetchItems(source) {
 
     if (items.length === before) warnings.push(`${file}: no usable items (format=${feed.format})`);
   }
+
+  shiftIntoLookbackWindow(items);
 
   if (!files.length) {
     return {

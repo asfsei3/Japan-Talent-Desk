@@ -11,7 +11,7 @@
  * resolved only against corroborating context.
  */
 import { all } from "../db/client.js";
-import { containsAlias, containsJapanese, normalize, normalizeAlias } from "../lib/text.js";
+import { containsAlias, containsJapanese, normalize } from "../lib/text.js";
 import { nowIso } from "../lib/time.js";
 
 /**
@@ -224,9 +224,10 @@ export function resolveEntities(text, index, opts = {}) {
   for (const [aliasNorm, hitEntry] of ambiguousHits) {
     const candidates = index.ambiguous.get(aliasNorm) ?? [];
 
-    // The full name appearing elsewhere in the text already settled it.
+    // A candidate's full name appearing elsewhere in the text already settled
+    // it, and that stronger match has already been emitted.
     const byFullName = candidates.filter((playerId) => directPlayerIds.has(playerId));
-    if (byFullName.length === 1) continue;
+    if (byFullName.length) continue;
 
     const byClub = candidates.filter((playerId) => {
       const clubId = index.playerById.get(playerId)?.current_club_id;
@@ -251,7 +252,7 @@ export function resolveEntities(text, index, opts = {}) {
       alias_norm: aliasNorm,
       match_field: field,
       candidates: candidates.map((playerId) => index.playerById.get(playerId)?.slug ?? playerId),
-      reason: byClub.length > 1 || byFullName.length > 1 ? "ambiguous_multiple_candidates" : "ambiguous_no_context",
+      reason: byClub.length > 1 ? "ambiguous_multiple_candidates" : "ambiguous_no_context",
     });
   }
 
@@ -263,10 +264,6 @@ export function resolveEntitiesDetailed(text, index, opts = {}) {
   const unresolved = [];
   const matches = resolveEntities(text, index, { ...opts, unresolved });
   return { matches, unresolved };
-}
-
-export function normalizeForMatching(value) {
-  return normalizeAlias(value);
 }
 
 export default { buildEntityIndex, resolveEntities, resolveEntitiesDetailed, MATCH_SCORES };

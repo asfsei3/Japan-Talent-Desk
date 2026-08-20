@@ -117,8 +117,13 @@ insert players with aliases in Hangul, insert sources, and set `market_priority`
        ▼                              ┌──────────────┐   ┌────────────────────┐
   ┌───────────────┐                   │signal_history│   │market_impact_studies│
   │ event_sources │  (event,url) U    │ (…,as_of)  U │   │ before/after · market│
-  │ tier · weight │                   └──────────────┘   └────────────────────┘
-  └───────────────┘
+  │ tier · weight │                   └──────────────┘   └──────────┬─────────┘
+  └───────────────┘                                                 │ benchmarks
+       │                                              ┌─────────────▼────────────┐
+       │                                              │  commercial_estimates    │
+       │                                              │  low/high · band · basis │
+       │                                              │  (type,id,club,mkt,key) U│
+       │                                              └──────────────────────────┘
        │
        ▼
   ┌──────────┐        ┌──────────────┐        ┌───────────────┐
@@ -178,7 +183,7 @@ strings. That is the language-arbitrage advantage stated as a data property.
 | Table | Purpose | Non-obvious columns |
 | --- | --- | --- |
 | `sources` | The source register. Tier, licence, health, learned reliability. | `provider` — per-row adapter selection (`rss`, `fixture`). `tier` 1–4, drives `SOURCE_TIERS` weight and confidence ceiling. `reliability_score` 0–100, learned; see `30-source-strategy.md`. `reports_total/correct/wrong` — the outcome ledger behind it. `commercial_use` — `allowed \| link_only \| restricted \| unknown`; gates what can be republished and what can be licensed onward. `robots_allowed` / `robots_checked_at` — cached robots.txt verdict. `consecutive_errors` — the alerting trigger. `etag` / `last_modified` — conditional-request cache; the main bandwidth and politeness control. |
-| `articles` | Collected item metadata. | `url_hash` UNIQUE — exact-duplicate key over the canonicalised URL (tracking params stripped, `www.` removed, trailing slash removed), so the same story shared through three campaigns is one row. `content_hash` — exact body-summary duplicate across different URLs. `simhash` — 64-bit near-duplicate key; two articles within Hamming distance 3 are the same wire story rewritten. `relevance_score` / `relevance_reason` — the prefilter verdict, stored so a rejection is explainable. `duplicate_of` — self-reference to the surviving row. `status` — `new \| prefiltered_out \| classified \| duplicate \| error`. |
+| `articles` | Collected item metadata. | `title_ja` / `summary_ja` — see "The `_ja` columns" below. `url_hash` UNIQUE — exact-duplicate key over the canonicalised URL (tracking params stripped, `www.` removed, trailing slash removed), so the same story shared through three campaigns is one row. `content_hash` — exact body-summary duplicate across different URLs. `simhash` — 64-bit near-duplicate key; two articles within Hamming distance 3 are the same wire story rewritten. `relevance_score` / `relevance_reason` — the prefilter verdict, stored so a rejection is explainable. `duplicate_of` — self-reference to the surviving row. `status` — `new \| prefiltered_out \| classified \| duplicate \| error`. |
 | `article_entities` | Resolved mentions. | `match_field` — `title \| excerpt`; title matches are worth 1.25× in the prefilter. `score` — per-match confidence, so an ambiguous surname match can be recorded without being trusted. |
 
 ### Events
@@ -198,9 +203,34 @@ strings. That is the language-arbitrage advantage stated as a data property.
 | `status` + `superseded_by` | `active \| superseded \| rejected \| pending_review`. Supersession is how a rumour lifecycle is recorded without deleting history. |
 | `review_required`, `reviewed_at`, `reviewed_by` | Human audit trail on the event itself, separate from the queue row. |
 
+`events.headline_ja` / `summary_ja` carry the Japanese rendering — see below.
+
 `event_sources.weight` is `SOURCE_TIERS[tier].weight` at insert time, snapshotted rather than
 joined. Reliability learning changes source weights over time; a signal computed last month
 should stay reproducible.
+
+### The `_ja` columns
+
+`articles.title_ja` / `summary_ja`, `events.headline_ja` / `summary_ja`, and
+`changes.headline_ja` / `detail_ja` carry the Japanese rendering of the product's own text.
+
+The schema comment states the rule and it is a legal one, not a stylistic one: these are
+**generated summaries of extracted facts, not translations of the source article**. A translation
+of a copyrighted article is a derivative work and is exactly what rule 2 exists to prevent.
+A Japanese sentence describing an event that JFI extracted, sourced and linked is JFI's own text.
+
+Consequences:
+
+- Generate `_ja` from the *event*, not from `articles.excerpt`. The input is the structured
+  `payload` plus `headline`, never the source prose.
+- Never populate `articles.title_ja` by translating `articles.title` verbatim. Summarise the
+  fact the headline asserts.
+- These columns are nullable and stay null when generation is skipped. A missing Japanese
+  rendering is a rendering fallback, not an error.
+- They are LLM output, so they are text, never a score. Rule 4 is untouched.
+- Cost: this is an extra generation per published item. `50-cost-model.md` folds it into the
+  extraction and brief calls by asking for both languages in one structured response, which is
+  materially cheaper than a second call.
 
 ### Signals, scores and history
 
@@ -210,6 +240,17 @@ should stay reproducible.
 | `signal_history` | One snapshot per entity/type/day. | `as_of_date` in JST. This table is what makes Transfer Momentum possible: `getMomentum()` is a lookup of today versus `as_of_date - windowDays`, not a recomputation. |
 | `metrics` | Every measured input, from any provider, for any market. | `provider` — `manual`, or a provider slug once social/search APIs are wired. `market` — `'JP'` today. `as_of_date` + `captured_at` — when it was true versus when we saw it. |
 | `market_impact_studies` | Before/after acquisition impact per player × club × metric × window. | `window_days` — 90 default; the same signing can be studied at 30/90/365. `delta_pct` stored, not computed on read, because `before_value` may later be corrected and the historical figure should not silently change. `confidence` — these are observational studies, not experiments. |
+| `commercial_estimates` | Forward-looking Japan commercial impact for a player × club pairing. | `low` / `high` — **a range, never a point**. `band` — `LOW \| MEDIUM \| HIGH \| VERY_HIGH`, the primary published form. `basis` — JSON naming which `market_impact_studies` benchmarks and which `metrics` produced the range; NOT NULL, so an estimate without a stated basis cannot be inserted. `confidence` defaults `unverified`. |
+
+`commercial_estimates` is where blueprint §17 ("what could happen in Japan if Club X signs Player
+Y?") lands, and the column design is the answer to why that question is dangerous. There is no
+`value` column. The publishable output is `band` plus `basis`; `low`/`high` exist so a range can
+be shown once enough `market_impact_studies` rows make one defensible. NOT NULL on `basis` means
+the schema itself refuses an unexplained number — the same guarantee rule 4 gives `signals`.
+
+Wording constraint from `docs/strategy/positioning.md`: an estimate is rendered as observed
+comparator ranges with named drivers, never as a forecast for the specific deal, and never with
+"guaranteed" or an unsupported comparison. See `85-risks.md`.
 
 `metrics` refusing to guess is the whole point. A Japan Market Score with coverage 0.42 is
 published as provisional with the missing components named. It is not published as a number
