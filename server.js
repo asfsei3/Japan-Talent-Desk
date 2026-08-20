@@ -33,6 +33,30 @@ if (existsSync(envPath)) {
   }
 }
 
+const { config } = await import("./src/config/index.js");
+
+/**
+ * The Japan Football Intelligence product is mounted under `config.basePath`
+ * (default `/intel`) so the deployed Japan Talent Desk landing page at `/` is
+ * untouched. Loading it lazily keeps the static site serving even if the
+ * intelligence layer fails to start.
+ */
+let intelHandler = null;
+
+async function getIntelHandler() {
+  if (intelHandler !== null) return intelHandler;
+
+  try {
+    const { createRequestHandler } = await import("./src/web/server.js");
+    intelHandler = createRequestHandler();
+  } catch (error) {
+    console.error("Japan Football Intelligence routes unavailable:", error?.message || error);
+    intelHandler = false;
+  }
+
+  return intelHandler;
+}
+
 const port = Number(process.env.PORT || 3000);
 const brevoApiKey = process.env.BREVO_API_KEY;
 const brevoNewsletterListId = Number(process.env.BREVO_LIST_ID_JAPAN_MARKET_WEEKLY || 0);
@@ -244,6 +268,28 @@ async function handleNewsletterSignup(request, response) {
 }
 
 createServer((request, response) => {
+  const path = (request.url || "/").split("?")[0];
+
+  if (path === config.basePath || path.startsWith(`${config.basePath}/`)) {
+    getIntelHandler()
+      .then((handler) => {
+        if (!handler) {
+          response.writeHead(503, { "content-type": "text/plain; charset=utf-8" });
+          response.end("Japan Football Intelligence is not available.");
+          return;
+        }
+        handler(request, response);
+      })
+      .catch((error) => {
+        console.error("Intelligence route failed:", error);
+        if (!response.headersSent) {
+          response.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
+        }
+        response.end("Internal error");
+      });
+    return;
+  }
+
   if (request.method === "POST" && request.url === "/api/newsletter") {
     handleNewsletterSignup(request, response).catch((error) => {
       console.error("Newsletter signup failed unexpectedly:", error);
@@ -269,5 +315,5 @@ createServer((request, response) => {
   });
   createReadStream(filePath).pipe(response);
 }).listen(port, () => {
-  console.log(`Japan Talent Desk static site running on port ${port}`);
+  console.log(`Japan Talent Desk site on port ${port} · intelligence mounted at ${config.basePath}`);
 });
