@@ -86,9 +86,32 @@ export function transaction(fn) {
   }
 }
 
+/**
+ * Columns added after the first schema was released. `CREATE TABLE IF NOT
+ * EXISTS` will not add a column to a table that already exists, so additive
+ * changes are replayed here. Each entry is idempotent.
+ */
+const ADDITIVE_COLUMNS = [
+  ["articles", "title_ja", "TEXT"],
+  ["articles", "summary_ja", "TEXT"],
+  ["events", "headline_ja", "TEXT"],
+  ["events", "summary_ja", "TEXT"],
+  ["changes", "headline_ja", "TEXT"],
+  ["changes", "detail_ja", "TEXT"],
+];
+
+function applyAdditiveColumns() {
+  for (const [table, column, type] of ADDITIVE_COLUMNS) {
+    const existing = all(`PRAGMA table_info(${table})`).map((row) => row.name);
+    if (existing.includes(column)) continue;
+    exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
+  }
+}
+
 export function migrate() {
   const schema = readFileSync(join(rootDir, "src", "db", "schema.sql"), "utf8");
   getDb().exec(schema);
+  applyAdditiveColumns();
   run(
     "INSERT INTO schema_meta (key, value) VALUES ('migrated_at', ?) " +
       "ON CONFLICT(key) DO UPDATE SET value = excluded.value",

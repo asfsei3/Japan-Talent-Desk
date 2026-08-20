@@ -152,6 +152,10 @@ CREATE TABLE IF NOT EXISTS articles (
   title           TEXT NOT NULL,
   -- Short factual summary only. Never the full copyrighted body.
   excerpt         TEXT,
+  -- Japanese rendering for the Japanese-first product. Generated, not scraped,
+  -- so it is a summary of the facts rather than a translation of the article.
+  title_ja        TEXT,
+  summary_ja      TEXT,
   author          TEXT,
   language        TEXT,
   published_at    TEXT,
@@ -199,6 +203,8 @@ CREATE TABLE IF NOT EXISTS events (
   to_club_id     INTEGER REFERENCES clubs(id),
   headline       TEXT NOT NULL,
   summary        TEXT,
+  headline_ja    TEXT,
+  summary_ja     TEXT,
   occurred_at    TEXT,
   detected_at    TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at     TEXT NOT NULL DEFAULT (datetime('now')),
@@ -314,6 +320,8 @@ CREATE TABLE IF NOT EXISTS changes (
   change_type  TEXT NOT NULL,               -- signal_band | new_event | confidence_up | club_linked | contract | injury | performance
   headline     TEXT NOT NULL,
   detail       TEXT,
+  headline_ja  TEXT,
+  detail_ja    TEXT,
   before_value TEXT,
   after_value  TEXT,
   importance   INTEGER NOT NULL DEFAULT 1,
@@ -431,6 +439,26 @@ CREATE TABLE IF NOT EXISTS watchlist_items (
   player_id    INTEGER NOT NULL REFERENCES players(id) ON DELETE CASCADE,
   added_at     TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE (watchlist_id, player_id)
+);
+
+-- Japan commercial impact, expressed as a RANGE with named drivers and a
+-- confidence -- never a point estimate. "Signing this player sells N shirts"
+-- is exactly the kind of unsupported claim the product refuses to make.
+CREATE TABLE IF NOT EXISTS commercial_estimates (
+  id           INTEGER PRIMARY KEY,
+  entity_type  TEXT NOT NULL DEFAULT 'player',
+  entity_id    INTEGER NOT NULL,
+  club_id      INTEGER REFERENCES clubs(id),
+  market       TEXT NOT NULL DEFAULT 'JP',
+  metric_key   TEXT NOT NULL,              -- jp_audience_uplift | jp_media_uplift | ...
+  low          REAL,
+  high         REAL,
+  unit         TEXT,
+  band         TEXT,                        -- LOW | MEDIUM | HIGH | VERY_HIGH
+  basis        TEXT NOT NULL,               -- JSON: which benchmarks and metrics produced this
+  confidence   TEXT NOT NULL DEFAULT 'unverified',
+  computed_at  TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (entity_type, entity_id, club_id, market, metric_key)
 );
 
 CREATE TABLE IF NOT EXISTS schema_meta (
