@@ -44,7 +44,7 @@ rank in `countries.market_priority`. See `20-data-model.md`.
                     │ articles │  status = new
                     └────┬─────┘
                          │  exact dupe → status = duplicate, duplicate_of
-                         │  near dupe (simhash hamming ≤ 3) → status = duplicate
+                         │  near dupe (simhash hamming ≤ 12, 3-day window) → status = duplicate
                          ▼
   L2  INTELLIGENCE ENGINE
       pipeline/prefilter.js  ── scoreArticle() ──►  relevance_score, relevance_reason
@@ -251,6 +251,49 @@ before the migration rather than during it.
 
 Estimate: 2–3 days including a dual-write verification window. Assumption, to be re-estimated
 once `src/db/client.js` is final.
+
+## Japanese-first, and what it costs the architecture
+
+`01-strategy-v1.md` §5 makes the UI, summaries and search Japanese. Architecturally this is
+cheaper than it sounds, because the schema already carries it: `articles.title_ja` /
+`summary_ja`, `events.headline_ja` / `summary_ja`, `changes.headline_ja` / `detail_ja`, and
+`name_ja` / `name_kana` on every reference entity.
+
+Three architectural rules follow:
+
+1. **Japanese text is generated in `classify.js`, in the same structured response as the English
+   extraction.** Not a separate translation pass, and never a translation of the source article —
+   a summary of the extracted facts. This is both the cost decision (`50-cost-model.md`) and the
+   copyright decision (`20-data-model.md`, rule 2).
+2. **`src/web/` renders Japanese; `/intel/admin/*` stays English.** The admin surface is an
+   operator tool, not the product. Mixing them would put translation work on the review queue,
+   which is the one place human minutes are scarce.
+3. **Nothing under `src/pipeline/` branches on language.** Language is a column
+   (`sources.language`, `articles.language`), a keyword set in the prefilter config, and a field
+   in an LLM response. A pipeline module with `if (lang === "ja")` control flow is a defect —
+   the same reasoning as the market-agnostic rule.
+
+## One engine, several assets
+
+v1.0 §10 states the engine will later carry AI Company Intelligence and Japan Market
+Intelligence. That is a real constraint on this codebase now, and it is almost entirely satisfied
+by decisions already made for other reasons:
+
+| Shared component | Already generic? |
+| --- | --- |
+| Source collector, RSS parsing, robots, ETag | Yes — `sources` is a table, nothing is football-specific |
+| Deduplication (`urlHash`, `contentHash`, `simhash`) | Yes — domain-free |
+| LLM provider registry, cache, cost ledger | Yes — `task` is a string |
+| Change detection, `changes` table | Yes — `(entity_type, entity_id)` is polymorphic |
+| Confidence scoring, `SOURCE_TIERS` | Yes — tiers are about sources, not sport |
+| Entity resolution | **Partly** — the alias tables and index are generic; `buildPlayerAliases()` contains Japanese-name logic that a company-name resolver would not want |
+| Signals | **No** — `transferSignal` and `japanMarketScore` are football-specific by design |
+
+The seam, when the second asset arrives, is between `src/pipeline/{collect,prefilter,resolve,
+classify,changes}.js` (generic) and `src/pipeline/{signals,intelligence}.js` plus the
+football-specific parts of the schema (domain). Do not extract a shared package now — v1.0 §11
+says do not develop all four at once, and a premature extraction would freeze interfaces that
+have not yet been used twice. Extract when the second asset exists, not before.
 
 ## Open items
 

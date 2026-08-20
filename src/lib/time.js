@@ -29,6 +29,13 @@ export function addDays(dateish, days) {
   return date;
 }
 
+/** Same-day arithmetic on a plain `YYYY-MM-DD` string, in and out. */
+export function shiftDate(isoDate, days) {
+  const date = new Date(`${isoDate}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
 export function isoDaysAgo(days, from = new Date()) {
   return addDays(from, -days).toISOString();
 }
@@ -75,4 +82,4 @@ export function formatDate(value, timezone = config.timezone) {
   }).format(date);
 }
 
-export default { nowIso, todayInTimezone, addDays, isoDaysAgo, dateDaysAgo, daysBetween, decayFactor };
+export default { nowIso, todayInTimezone, addDays, shiftDate, isoDaysAgo, dateDaysAgo, daysBetween, decayFactor };

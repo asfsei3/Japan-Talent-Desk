@@ -4,7 +4,9 @@ This folder keeps Japan Talent Desk operating knowledge separate from the public
 
 ## Current intent
 
-- `strategy/`: current positioning, wording rules, and source-of-truth summaries
+- `strategy/`: current JTD (B2B) positioning, wording rules, and source-of-truth summaries
+- `strategy/jfi/`: Japan Football Intelligence (the free, Japanese-first `/intel` product) —
+  architecture, data model, source strategy, API costs, cost model, and automation plan
 - `outbound/`: outbound sequencing, CTA rules, CRM notes, and attachment logic
 - `newsletter/`: Japan Market Weekly notes, editorial rules, and Brevo operating details
 - `reports/`: sample note structure, report principles, and PDF/export workflow

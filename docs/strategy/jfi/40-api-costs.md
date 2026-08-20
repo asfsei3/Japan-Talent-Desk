@@ -7,6 +7,14 @@ any provider is enabled, and re-check all pricing quarterly.
 Blueprint §27 requires this register. It replaces the `docs/strategy/api-costs.md` path named
 there; see `90-decision-log.md`.
 
+**Hard ceiling: ¥10,000/month for everything on this page** (`01-strategy-v1.md` §13), rising to
+¥30,000 then ¥50,000 as users or revenue appear. At an assumed ¥150/USD that is **$66.70/month**.
+Every row is measured against that number, not against whether it is individually cheap. FX is an
+assumption — the LLM bill is USD-denominated, so a weak yen shrinks the budget without anything
+changing on this page.
+
+v1.0 §13 also asks for a status classification per service. Added as a column below.
+
 ## Rules for this file
 
 1. **Anthropic pricing is confirmed** against the Claude API reference (checked 2026-08-20).
@@ -36,6 +44,44 @@ there; see `90-decision-log.md`.
 
 **Phase 1 committed total: LLM ~$19/mo + Railway `VERIFY` + Brevo `VERIFY`.** Every other row is
 Phase 2 or later and unbudgeted. Nothing in the paid columns is required for the MVP to work.
+Against the ¥10,000 ceiling that is roughly ¥2,900 for LLM at 1,000 articles/day, leaving ~¥7,100
+for hosting and everything else. Detail in `50-cost-model.md`.
+
+## Service status classification
+
+`01-strategy-v1.md` §13 asks for each service to be classed. The classes matter because two of
+them are disqualifying in phase one.
+
+| Class | Services | Note |
+| --- | --- | --- |
+| Free | RSS collection, error monitoring via `job_runs` | The MVP runs entirely on these plus LLM. |
+| Free tier | Brevo (`VERIFY` the cap) | Verify the cap covers the projected list. |
+| Paid | Railway | Fixed, small, unavoidable. |
+| Usage based | Anthropic | The only line that scales with product volume. Bounded by `config.llm.dailyCostBudgetUsd`. |
+| Requires partnership | social metrics; some news APIs; most affiliate networks | **v1.0 §6 constraint 5 and §18 both say the business must not depend on these in phase one.** Adopt only opportunistically, once traffic exists. |
+| Manual | `metrics` entry for social, search interest, market values | The honest phase-one answer for every input we cannot buy cleanly. |
+
+## Monetisation-side providers
+
+v1.0 §6 adds advertising and affiliate revenue to the free layer. These are providers too, and
+they carry obligations rather than costs.
+
+| Provider | Purpose | Cost | Status | Restrictions | Exit |
+| --- | --- | --- | --- | --- | --- |
+| Ad network (undecided) | Display slots below the fold | revenue, not cost | `VERIFY` | Must not sit between a claim and its sources (v1.0 §6.2). Nothing above the fold (§6.4). | config-driven empty slots; removing an ad network is a config change |
+| Affiliate — shirts / goods / boots | Player-page contextual placements | revenue | Requires approval → `VERIFY` self-signup availability | Every block labelled 広告 / PR | as above |
+| Affiliate — streaming (Japan market) | Fixture-context placements | revenue | Requires approval → `VERIFY` | as above | as above |
+
+Three rules that are not negotiable and belong here rather than only in a design doc:
+
+1. **Build the slots as empty, config-driven placeholders now; fill them later.** v1.0 §4. This
+   keeps the layout honest and avoids a retrofit.
+2. **Every monetised block carries a visible 広告 / PR label.** Japan's stealth-marketing rules
+   under 景品表示法 treat unlabelled advertising as a misleading representation, and this product
+   is aimed squarely at a Japanese consumer audience. Confirm the exact labelling requirement with
+   Japanese counsel before the first paid placement — see `85-risks.md`.
+3. **The core product must be viable at zero affiliate revenue.** v1.0 §18. If a page only makes
+   sense with the affiliate block in it, the page is wrong.
 
 ## Per-provider notes
 

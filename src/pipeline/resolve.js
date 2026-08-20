@@ -160,6 +160,24 @@ function haystacks(text) {
   return { latin, japanese: latin.replace(/\s+/g, "") };
 }
 
+/**
+ * Club aliases nest, especially in Japanese: レアル (Real Madrid) is a substring
+ * of レアルソシエダ, so a Real Sociedad headline would otherwise also report
+ * Real Madrid. A club survives only if at least one of its matched aliases is
+ * not contained inside a longer alias belonging to a different club.
+ */
+function keepLongestClubAliases(hits) {
+  return hits.filter(
+    (entry) =>
+      !hits.some(
+        (other) =>
+          other.clubId !== entry.clubId &&
+          other.aliasNorm.length > entry.aliasNorm.length &&
+          other.aliasNorm.includes(entry.aliasNorm)
+      )
+  );
+}
+
 function best(map, key, candidate) {
   const current = map.get(key);
   if (!current || candidate.score > current.score) map.set(key, candidate);
@@ -183,19 +201,23 @@ export function resolveEntities(text, index, opts = {}) {
     containsAlias(entry.isJapanese ? hay.japanese : hay.latin, entry.aliasNorm, entry.isJapanese);
 
   // Clubs first: they are the main corroborating context for ambiguous names.
-  const matchedClubIds = new Set();
+  const clubHits = [];
   for (const entries of index.clubs.values()) {
     for (const entry of entries) {
-      if (!hit(entry)) continue;
-      matchedClubIds.add(entry.clubId);
-      best(matched, `club:${entry.clubId}`, {
-        entity_type: "club",
-        entity_id: entry.clubId,
-        matched_text: entry.alias,
-        match_field: field,
-        score: MATCH_SCORES.club[field],
-      });
+      if (hit(entry)) clubHits.push(entry);
     }
+  }
+
+  const matchedClubIds = new Set();
+  for (const entry of keepLongestClubAliases(clubHits)) {
+    matchedClubIds.add(entry.clubId);
+    best(matched, `club:${entry.clubId}`, {
+      entity_type: "club",
+      entity_id: entry.clubId,
+      matched_text: entry.alias,
+      match_field: field,
+      score: MATCH_SCORES.club[field],
+    });
   }
 
   const directPlayerIds = new Set();

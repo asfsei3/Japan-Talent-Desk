@@ -162,7 +162,12 @@ export const config = {
     },
     maxOutputTokens: num("JFI_LLM_MAX_OUTPUT_TOKENS", 1600),
     dailyCallBudget: num("JFI_LLM_DAILY_CALL_BUDGET", 600),
-    dailyCostBudgetUsd: num("JFI_LLM_DAILY_COST_BUDGET_USD", 5),
+    // $5/day ($152/mo, ¥22,800) is more than double the whole Phase 1 budget in
+    // `docs/strategy/jfi/50-cost-model.md` — a runaway loop would burn two months
+    // of budget in one day before this guardrail ever fired. $1.50/day ($45.6/mo)
+    // leaves ~¥7,000/mo for LLM against the ¥10,000/mo Phase 1 ceiling. See
+    // `docs/strategy/jfi/90-decision-log.md`.
+    dailyCostBudgetUsd: num("JFI_LLM_DAILY_COST_BUDGET_USD", 1.5),
     cacheTtlDays: num("JFI_LLM_CACHE_TTL_DAYS", 45),
   },
 

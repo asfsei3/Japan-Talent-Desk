@@ -6,7 +6,8 @@
  * and inspected by hand. Run `npm run jfi -- help` for the list.
  */
 import { config } from "./config/index.js";
-import { all, closeDb, get, migrate, run } from "./db/client.js";
+import { all, closeDb, get, migrate } from "./db/client.js";
+import { withJobRun } from "./jobs/run-tracking.js";
 import { createLogger } from "./lib/logger.js";
 import { todayInTimezone } from "./lib/time.js";
 
@@ -24,25 +25,6 @@ function parseArgs(argv) {
     }
   }
   return { positional, flags };
-}
-
-async function withJobRun(jobName, fn) {
-  const { lastInsertRowid } = run("INSERT INTO job_runs (job_name) VALUES (?)", jobName);
-  const jobId = Number(lastInsertRowid);
-  try {
-    const stats = (await fn()) ?? {};
-    run(
-      "UPDATE job_runs SET finished_at = datetime('now'), status = 'ok', stats = ? WHERE id = ?",
-      JSON.stringify(stats), jobId
-    );
-    return stats;
-  } catch (error) {
-    run(
-      "UPDATE job_runs SET finished_at = datetime('now'), status = 'error', error = ? WHERE id = ?",
-      error?.message || String(error), jobId
-    );
-    throw error;
-  }
 }
 
 const commands = {
@@ -92,21 +74,10 @@ const commands = {
     return withJobRun("changes", () => detectChanges({ asOfDate: flags.date }));
   },
 
-  /** The every-1-3-hours job. */
+  /** The 2-hourly job (`60-automation-plan.md`). */
   async pipeline(flags) {
-    const { collect } = await import("./pipeline/collect.js");
-    const { prefilterPending } = await import("./pipeline/prefilter.js");
-    const { classifyPending } = await import("./pipeline/classify.js");
-    const { recomputeSignals } = await import("./pipeline/signals.js");
-    const { detectChanges } = await import("./pipeline/changes.js");
-
-    return withJobRun("pipeline", async () => ({
-      collect: await collect({ limit: flags.limit ? Number(flags.limit) : undefined }),
-      prefilter: prefilterPending({}),
-      classify: await classifyPending({ limit: flags.limit ? Number(flags.limit) : undefined }),
-      signals: recomputeSignals({}),
-      changes: detectChanges({}),
-    }));
+    const { runPipeline } = await import("./jobs/pipeline.js");
+    return withJobRun("pipeline", () => runPipeline({ limit: flags.limit ? Number(flags.limit) : undefined }));
   },
 
   /** The daily job: snapshot signals, build the brief, draft social posts. */

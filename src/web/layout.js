@@ -1,10 +1,10 @@
 /**
  * The HTML document shell.
  *
- * Server-rendered strings, no build step, no client framework. The only
- * external request is the Google Fonts stylesheet the Japan Talent Desk landing
- * page already loads, so the intelligence pages are a sibling of that design
- * rather than a stranger to it.
+ * Server-rendered strings, no build step, no client framework. The only external
+ * request is the Google Fonts stylesheet the Japan Talent Desk landing page
+ * already loads — no CJK webfont is added, because the file weight is not worth
+ * it when every target device has a good system Japanese face.
  */
 import { config } from "../config/index.js";
 import { escapeHtml } from "../lib/text.js";
@@ -13,11 +13,13 @@ import { attr } from "./components.js";
 const FONTS_HREF =
   "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap";
 
+export const SITE_NAME_JA = "日本サッカー・インテリジェンス";
+
 export const NAV = [
-  { href: "", label: "What changed" },
-  { href: "/players", label: "Players" },
-  { href: "/transfer-radar", label: "Transfer radar" },
-  { href: "/about", label: "About" },
+  { href: "", label: "今日の変化" },
+  { href: "/players", label: "選手一覧" },
+  { href: "/transfer-radar", label: "移籍レーダー" },
+  { href: "/about", label: "このサイトについて" },
 ];
 
 export function path(suffix = "") {
@@ -50,9 +52,8 @@ function navHtml(current) {
  * @param {object} options
  * @param {string} options.title      Page <title>, without the site suffix.
  * @param {string} options.body       Pre-escaped HTML for <main>.
- * @param {string} [options.description]
- * @param {string} [options.canonicalPath] Path (including base path) for the canonical URL.
  * @param {boolean} [options.noindex] Admin and query-filtered pages set this.
+ * @param {string} [options.lang]     Admin is an operator tool and stays English.
  */
 export function renderPage({
   title,
@@ -64,12 +65,57 @@ export function renderPage({
   noindex = false,
   bodyClass = "",
   headExtra = "",
+  lang = "ja",
+  siteName = SITE_NAME_JA,
+  chrome = true,
 } = {}) {
-  const fullTitle = `${title} | ${config.siteName}`;
+  const fullTitle = `${title}｜${siteName}`;
   const canonical = origin && canonicalPath ? `${origin}${canonicalPath}` : "";
 
+  const header = chrome
+    ? `<header class="intel-header">
+      <div class="container intel-header-inner">
+        <a class="brand" href="${attr(path(""))}"><span class="brand-flag" aria-hidden="true">🇯🇵</span>${escapeHtml(siteName)}</a>
+        <nav class="intel-nav" aria-label="メインナビゲーション">${navHtml(current)}</nav>
+        <a class="intel-header-link" href="/">${escapeHtml(config.b2bName)}</a>
+      </div>
+    </header>`
+    : "";
+
+  const footer = chrome
+    ? `<footer class="intel-footer">
+      <div class="container intel-footer-inner">
+        <div class="footer-block">
+          <p class="footer-brand">${escapeHtml(siteName)}</p>
+          <p>
+            本サイトは初期スクリーニングであり、獲得の最終判断ではありません。移籍金・給与・移籍可能性・
+            フィジカル面の数値は、いずれも直接確認が必要な要確認事項です。
+          </p>
+        </div>
+        <div class="footer-block">
+          <p class="footer-label">方法論</p>
+          <ul class="footer-list">
+            <li><a href="${attr(path("/about#confidence"))}">信頼度とスコアの考え方</a></li>
+            <li><a href="${attr(path("/about#corrections"))}">訂正ポリシー</a></li>
+            <li><a href="${attr(path("/api/health"))}">API ステータス</a></li>
+          </ul>
+        </div>
+        <div class="footer-block">
+          <p class="footer-label">運営</p>
+          <ul class="footer-list">
+            <li><a href="/">${escapeHtml(config.b2bName)}</a></li>
+            <li><a href="mailto:scout@ai-orchestra.work">scout@ai-orchestra.work</a></li>
+          </ul>
+          <p class="footer-fine">
+            見出しとリンクのみを掲載しています。記事全文は転載せず、すべての記述は元の出典へリンクします。
+          </p>
+        </div>
+      </div>
+    </footer>`
+    : "";
+
   return `<!doctype html>
-<html lang="en">
+<html lang="${attr(lang)}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -79,7 +125,8 @@ export function renderPage({
     ${canonical ? `<link rel="canonical" href="${attr(canonical)}" />` : ""}
     <meta name="theme-color" content="#0f241b" />
     ${metaTag("og:type", "website", { property: true })}
-    ${metaTag("og:site_name", config.siteName, { property: true })}
+    ${metaTag("og:locale", lang === "ja" ? "ja_JP" : "en_GB", { property: true })}
+    ${metaTag("og:site_name", siteName, { property: true })}
     ${metaTag("og:title", fullTitle, { property: true })}
     ${metaTag("og:description", description, { property: true })}
     ${canonical ? metaTag("og:url", canonical, { property: true }) : ""}
@@ -90,58 +137,19 @@ export function renderPage({
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="${attr(FONTS_HREF)}" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/assets/intel.css" />
     ${headExtra}
   </head>
   <body class="intel-body${bodyClass ? ` ${attr(bodyClass)}` : ""}">
-    <a class="skip-link" href="#main">Skip to content</a>
-
-    <header class="intel-header">
-      <div class="container intel-header-inner">
-        <a class="brand" href="${attr(path(""))}">${escapeHtml(config.siteName)}</a>
-        <nav class="intel-nav" aria-label="Primary navigation">${navHtml(current)}</nav>
-        <a class="intel-header-link" href="/">${escapeHtml(config.b2bName)}</a>
-      </div>
-    </header>
-
+    <a class="skip-link" href="#main">本文へスキップ</a>
+${header}
     <main id="main" class="intel-main">
 ${body}
     </main>
-
-    <footer class="intel-footer">
-      <div class="container intel-footer-inner">
-        <div class="footer-block">
-          <p class="footer-brand">${escapeHtml(config.siteName)}</p>
-          <p>
-            An initial role-specific screen, not a final recruitment recommendation. Transfer fee,
-            salary, availability and physical benchmarks should be treated as verification items.
-          </p>
-        </div>
-        <div class="footer-block">
-          <p class="footer-label">Method</p>
-          <ul class="footer-list">
-            <li><a href="${attr(path("/about"))}">How confidence and scores work</a></li>
-            <li><a href="${attr(path("/about#corrections"))}">Correction policy</a></li>
-            <li><a href="${attr(path("/api/health"))}">API health</a></li>
-          </ul>
-        </div>
-        <div class="footer-block">
-          <p class="footer-label">Desk</p>
-          <ul class="footer-list">
-            <li><a href="/">${escapeHtml(config.b2bName)}</a></li>
-            <li><a href="mailto:scout@ai-orchestra.work">scout@ai-orchestra.work</a></li>
-          </ul>
-          <p class="footer-fine">
-            Headlines and links only. Full articles are never reproduced; every claim links back to
-            its original source.
-          </p>
-        </div>
-      </div>
-    </footer>
+${footer}
   </body>
 </html>
 `;
 }
 
-export default { renderPage, path, originFrom, NAV };
+export default { renderPage, path, originFrom, NAV, SITE_NAME_JA };

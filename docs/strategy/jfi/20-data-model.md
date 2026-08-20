@@ -289,102 +289,107 @@ product exists.
 
 ## `dedupe_key` construction
 
-Not expressible as a SQL constraint, so it is normative here. `persist.js` and `changes.js`
-must implement exactly this.
+Not expressible as a SQL constraint, so it is documented here. `src/pipeline/persist.js`
+(`buildDedupeKey`, `subtypeFamily`, `timeBucket`) and `src/pipeline/changes.js` are the
+implementation; this section explains what they do and why.
 
 ### `events.dedupe_key`
 
-The key identifies **the claim**, not the report of it. A second outlet reporting the same
-thing must merge into the existing event and add an `event_sources` row — that is how
-`independent_source_count` rises and confidence gets promoted. If a second report created a
-second event, confidence could never be earned.
-
-Two families:
-
-**Continuing claims** — `transfer`, `contract`, `club_situation`, `commercial`. These are one
-ongoing state, reported repeatedly. **No time component.**
+The key identifies **the claim**, not the report of it. A second outlet reporting the same thing
+merges into the existing event and adds an `event_sources` row — that is how
+`independent_source_count` rises and confidence gets promoted. If every report created its own
+event, confidence could never be earned and the source-count figure would be a duplicate count.
 
 ```
-<type>:<subtype>:p<player_id>:<counterparty>
+dedupe_key = shortHash( type | subtypeFamily | player | counterparty | bucket , 32 )
 ```
 
-- `<counterparty>`: for `transfer`, `to<to_club_id>` if known, else `from<from_club_id>`, else `-`.
-  For `contract` and `club_situation`, `c<club_id>`. For `commercial`, `c<club_id>` or `-`.
-- Missing ids render as `-`.
+| Part | Value |
+| --- | --- |
+| `type` | from `EVENT_TYPES` |
+| `subtypeFamily` | the subtype's **family**, not the raw string |
+| `player` | `player:<id>`, or `name:<normalised>` when the player is unresolved |
+| `counterparty` | `club:<id>` — `to_club_id`, else `club_id`, else `from_club_id`, else `club:none` |
+| `bucket` | `bucket:<n>` where `n = floor(days_since_epoch / BUCKET_DAYS)`, `BUCKET_DAYS = 14` |
 
-```
-transfer:interest:p17:to42
-transfer:bid:p17:to42
-contract:renewal:p9:c12
-```
+**Subtype families** collapse the vocabulary variation the extractor produces. `interested`,
+`linked`, `monitoring`, `tracking`, `scouting`, `target` and `eyeing` are all `interest`.
+`agreed`, `personal_terms`, `medical` and `here_we_go` are all `agreement`. Without this,
+two outlets describing the same link in different words produce two events and the independence
+count never rises — which is the exact failure the key exists to prevent.
 
-**Repeatable point events** — `injury`, `performance`, `national_team`, `media`, `social`.
-The same player can genuinely have the same event again. **Include the date.**
+The families are also the **lifecycle ladder**: `interest → talks → bid → agreement → completed`,
+plus `renewal`/`expiry` for contracts and `out`/`return` for injuries. Moving up the ladder
+changes the family, so it changes the key, so it creates a new event. On promotion the previous
+event gets `status = 'superseded'` and `superseded_by` set to the new id. That chain is the rumour
+lifecycle and the training set described in `80-product-ideas.md`. Never mutate a subtype in
+place — the history is the asset.
 
-```
-<type>:<subtype>:p<player_id>:<counterparty>:<date>
-```
+**The 14-day bucket** is the deliberate trade-off, and the code comment states it plainly: it stops
+one claim fragmenting across the week it is reported, at the cost of a boundary that can split a
+very long-running story in two. The alternative — no time component for continuing claims — was
+considered and is worse: it merges a January link and a June link into a single event, which
+misrepresents a year-long saga as one continuous claim and corrupts every recency-weighted signal
+computed from it. A split story is visible and fixable from the admin UI; a merged one is invisible.
 
-- `<date>` = `occurred_at` truncated to `YYYY-MM-DD`, falling back to the JST detected date
-  (`time.todayInTimezone()`) when `occurred_at` is unknown.
+**The key is hashed, not readable.** `shortHash(..., 32)` produces a fixed-width 32-char value.
+Readability was the alternative and was rejected: the parts include a normalised player name that
+may contain arbitrary text from an extractor, and an unbounded readable key in a UNIQUE index is a
+worse trade than losing at-a-glance debuggability. Reconstruct a key by calling `buildDedupeKey`
+with the same parts.
 
-```
-injury:out:p17:-:2026-08-14
-performance:goal:p23:c8:2026-08-16
-national_team:callup:p9:-:2026-08-18
-```
+Two rules the key cannot enforce:
 
-Rules that apply to both:
-
-1. Lowercase the whole key. Ids are integers, never slugs — a slug rename would orphan the key.
-2. Never include the article, the source, or the detection timestamp. Those belong in
+1. Never include the article, the source, or the detection timestamp. Those belong in
    `event_sources`.
-3. The key is stored readable, not hashed. It appears in the admin UI and in support questions,
-   and readability is worth more than the bytes.
-4. **Subtype changes produce a new row.** `interest → bid → agreement → completed` is four keys.
-   On promotion, set the previous event's `status = 'superseded'` and `superseded_by` to the new
-   id. This chain is the rumour lifecycle and the training set described in `80-product-ideas.md`.
-   Do not mutate a subtype in place; the history is the asset.
-5. A `player_id` of null is allowed only for `club_situation` and `commercial`. A transfer,
-   contract or injury event with no player is a resolution failure and belongs in
-   `review_queue`, not in `events`.
+2. A `player_id` of null is acceptable only for `club_situation` and `commercial`. A transfer,
+   contract or injury event with no resolved player uses the `name:` fallback and belongs in
+   `review_queue` with reason `new_player_entity` or `ambiguous_entity`, not silently in `events`.
 
 ### `changes.dedupe_key`
 
-One change per entity per type per JST day. `detectChanges()` runs on every pipeline tick —
-eight times a day — and must be idempotent. Without this, a signal that rose once produces
-eight "MEDIUM → HIGH" rows.
+One change per entity per type per JST day. `detectChanges()` runs on every pipeline tick — ten
+times a day — and must be idempotent. Without this, a signal that rose once produces ten
+"MEDIUM → HIGH" rows. The insert is `ON CONFLICT(dedupe_key) DO NOTHING`, so idempotency is
+enforced by the database rather than by a prior read.
+
+Readable here, pipe-separated:
 
 ```
-<as_of_date>:<entity_type>:<entity_id>:<change_type>:<discriminator>
+<as_of_date>|<change_type>|<entity>|<discriminator>
 ```
 
-| `change_type` | `<discriminator>` |
+| `change_type` | Key shape |
 | --- | --- |
-| `new_event` | `e<event_id>` |
-| `signal_band` | `<signal_type>:<before_band>><after_band>` |
-| `confidence_up` | `e<event_id>:<after_confidence>` |
-| `club_linked` | `c<club_id>` |
-| `contract`, `injury`, `performance` | `e<event_id>` |
+| `signal_band` | `<date>\|signal_band\|player:<id>\|<signal_type>\|<before>><after>` |
+| `new_event` | `<date>\|new_event\|player:<id>\|event:<event_id>` |
+| `confidence_up` | `<date>\|confidence_up\|event:<event_id>\|<to_confidence>` |
+| `club_linked` | `<date>\|club_linked\|player:<id>\|club:<club_id>` |
+| `contract`, `injury`, `performance` | `<date>\|<change_type>\|player:<id>\|event:<event_id>` |
 
 ```
-2026-08-20:player:17:signal_band:transfer:medium>high
-2026-08-20:player:17:new_event:e4821
-2026-08-20:player:17:club_linked:c42
+2026-08-20|signal_band|player:17|transfer|medium>high
+2026-08-20|new_event|player:17|event:4821
+2026-08-20|club_linked|player:17|club:42
 ```
 
-Rules:
+Why each part is there:
 
 1. `as_of_date` is always JST (`time.todayInTimezone()`), never UTC. A European evening report
-   lands on the following JST day, which is correct: the audience reads it in the morning in Japan.
-   See `90-decision-log.md`.
-2. Include `<signal_type>` in the `signal_band` discriminator. A player whose transfer signal and
-   Japan Market Score both move on the same day has two legitimate changes.
-3. Band transitions are recorded against the band, not the score. A score moving 51 → 54 is not a
-   change; 49 → 51 crossing into `high` is. This is what keeps the daily brief short.
-4. If a band oscillates within one day — `medium → high → medium` — the second transition writes a
-   distinct key and both rows exist. Correct: the reader should see the walk-back. The brief
-   renders the net position, not each hop.
+   lands on the following JST day, which is correct: the audience reads it in the morning in
+   Japan. See `90-decision-log.md`.
+2. `<signal_type>` is in the `signal_band` key because a player whose transfer signal and Japan
+   Market Score both move on the same day has two legitimate changes.
+3. Band transitions key on the **band**, not the score. 51 → 54 is not a change; 49 → 51 crossing
+   into `high` is. This is what keeps the daily brief short enough to read.
+4. A band that oscillates within one day — `medium → high → medium` — writes two distinct keys and
+   both rows exist. Correct: the reader should see the walk-back rather than a silently reverted
+   number.
+
+`changes.js` also enforces `withinWordingRules()` against `FORBIDDEN_PHRASES` before emitting a
+headline. That is `docs/strategy/positioning.md`'s wording list — "final recommendation", "hidden
+gem", "guaranteed", "risk-free" — implemented as a gate rather than a style guide. A generated
+headline that trips it does not get published.
 
 ## Deliberate omissions
 
