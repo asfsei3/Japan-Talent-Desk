@@ -87,6 +87,26 @@ export function interestScore(request, destination) {
 }
 
 /**
+ * How well a month suits what the traveller asked to do, ignoring price entirely.
+ *
+ * Kept separate from cost so the two can disagree out loud: a beach is cheapest in January
+ * precisely because nobody wants to swim then, and any advice to shift dates has to know that.
+ *
+ * @returns {number} 0-1, where 1 is fully in season for everything requested.
+ */
+export function seasonalSuitability(request, month) {
+  const requested = request.interests || [];
+
+  if (!month || requested.length === 0) {
+    return 1;
+  }
+
+  const values = requested.map((tag) => interestSeasonality[tag]?.[month - 1] ?? 1);
+
+  return mean(values);
+}
+
+/**
  * Budget fit.
  *
  * Deliberately not "cheapest wins". A trip that uses most of the stated budget is exactly what

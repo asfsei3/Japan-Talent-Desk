@@ -16,6 +16,7 @@ import {
   estimateBand,
   farePolicies,
   includedBreakfastShare,
+  includedDinnerShare,
   mealRates,
   occupancy,
   rentalCar,
@@ -168,21 +169,28 @@ function mealCost(request, destination, tier) {
 
   const gross = dailyForParty * days;
 
-  // An included breakfast is a real discount on food spend, and it is the single most common
-  // reason a slightly dearer room is the better buy. Modelling it is what lets the engine
-  // recommend the ¥52,000 hotel over the ¥45,000 one.
-  const breakfastPeople = party.adults + party.children;
+  // Meals included in the room rate are a real discount on food spend, and the commonest
+  // reason a slightly dearer room is the better buy: it is what lets the engine recommend the
+  // ¥52,000 hotel over the ¥45,000 one.
+  //
+  // Credits are taken against `dailyForParty`, which is already weighted by age, so a child's
+  // included meal is credited at a child's rate rather than an adult's.
   const breakfastCredit =
-    (tier.breakfastIncludedRate ?? 0) *
-    request.nights *
-    breakfastPeople *
-    destination.mealIndexYen *
-    includedBreakfastShare;
+    (tier.breakfastIncludedRate ?? 0) * request.nights * dailyForParty * includedBreakfastShare;
+
+  // Dinner matters far more than breakfast in Japan, because onsen ryokan are sold 一泊二食
+  // and the dinner is frequently the reason for the stay.
+  const dinnerCredit =
+    (tier.dinnerIncludedRate ?? 0) * request.nights * dailyForParty * includedDinnerShare;
+
+  const includedMealsCredit = breakfastCredit + dinnerCredit;
 
   return {
-    yen: round(Math.max(0, gross - breakfastCredit)),
+    yen: round(Math.max(0, gross - includedMealsCredit)),
     grossYen: round(gross),
     includedBreakfastCreditYen: round(breakfastCredit),
+    includedDinnerCreditYen: round(dinnerCredit),
+    includedMealsCreditYen: round(includedMealsCredit),
     days,
   };
 }

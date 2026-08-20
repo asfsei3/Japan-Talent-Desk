@@ -22,6 +22,7 @@ import {
   scoringInternals,
 } from "./scoring.js";
 import { explainCandidate } from "./explain.js";
+import { analyzeTiming } from "./timing.js";
 import { buildBookingLinks } from "./affiliate.js";
 
 const tierNames = ["budget", "standard", "family"];
@@ -159,6 +160,14 @@ function pickCategories(request, ranked, configurations) {
       ? affordable
       : [...ranked].sort((a, b) => a.cost.totalYen - b.cost.totalYen).slice(0, 5);
 
+  // Picks that optimise their own axis — family suitability, ease of travel — must still
+  // respect what was actually asked for. Without this floor, a beach request could be answered
+  // with a landlocked highland resort purely because it scores well with children, which
+  // ignores the one thing the user actually stated.
+  const bestPoolInterest = Math.max(...pool.map((candidate) => candidate.scores.interest));
+  const relevantPool = pool.filter((candidate) => candidate.scores.interest >= bestPoolInterest * 0.5);
+  const themedPool = relevantPool.length > 0 ? relevantPool : pool;
+
   // The budget pick searches every configuration, not just the per-destination winners, so it
   // can surface a cheaper hotel tier that the composite passed over. It still has to be a trip
   // the user would want: anything scoring far below the best available interest match is a
@@ -174,7 +183,7 @@ function pickCategories(request, ranked, configurations) {
   }
 
   if (request.children.length > 0) {
-    const family = [...pool].sort((a, b) => (b.scores.family ?? 0) - (a.scores.family ?? 0))[0];
+    const family = [...themedPool].sort((a, b) => (b.scores.family ?? 0) - (a.scores.family ?? 0))[0];
 
     if (family) {
       categories.push({ key: "family", label: { ja: "家族連れベスト", en: "Best for Families" }, candidate: family });
@@ -182,7 +191,7 @@ function pickCategories(request, ranked, configurations) {
   }
 
   if (request.constraints?.easyTransport) {
-    const easy = [...pool].sort(
+    const easy = [...themedPool].sort(
       (a, b) => b.scores.time + b.scores.convenience - (a.scores.time + a.scores.convenience)
     )[0];
 
@@ -249,6 +258,7 @@ function presentCandidate(request, candidate, configurations, categoryKey, affil
     },
     withinBudget: request.budgetYen ? candidate.cost.totalYen <= request.budgetYen : null,
     explanation: explainCandidate(request, candidate, categoryKey),
+    timing: analyzeTiming(request, candidate.destination, candidate.route, candidate.tier),
     alternatives: alternativesFor(candidate, configurations),
     bookingLinks: buildBookingLinks(candidate, affiliateConfig),
     provenance: candidate.destination.provenance,

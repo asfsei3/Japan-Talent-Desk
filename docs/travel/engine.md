@@ -19,6 +19,7 @@ scored configurations
    ↓  recommend.js              best configuration per destination, then rank destinations
 ranked destinations
    ↓  recommend.js              category winners (overall / budget / family / per interest)
+   ↓  timing.js                 cheaper months that are still in season
    ↓  explain.js                grounded JP + EN explanation
    ↓  affiliate.js              booking hand-off links — LAST, never before ranking
 result
@@ -38,6 +39,7 @@ waits, which is what holds the marginal cost of a query at ¥0.
 | `engine/cost-model.js` | True Trip Cost for one configuration |
 | `engine/scoring.js` | Score components and the adaptive weights |
 | `engine/recommend.js` | Enumeration, ranking, category selection |
+| `engine/timing.js` | Whether shifting the dates would be cheaper without going out of season |
 | `engine/explain.js` | Explanations generated from computed values |
 | `engine/affiliate.js` | Booking links and affiliate configuration |
 | `engine/share.js` | Save/share encoding, no database |
@@ -51,7 +53,7 @@ Total cost is the sum of six named components, all shown to the user:
 | --- | --- |
 | Transport | Round trip, per fare policy for the mode, with child and infant bands |
 | Accommodation | Rooms × nights × nightly rate, with family-room capacity and 添い寝無料 modelled |
-| Meals | Per-person daily rate by age, less an included-breakfast credit |
+| Meals | Per-person daily rate by age, less a credit for meals included in the room rate |
 | Local transport | Rental car (with vehicle sizing) or public transit, decided per request |
 | Activities | Per-person day rate × activity level × active days |
 | Contingency | 6% of subtotal, named rather than hidden |
@@ -67,6 +69,14 @@ no difference to the cost of reaching Hakone.
 sleep four, and many properties let young children share bedding at no charge. Sizing rooms as
 "party ÷ 2" would systematically overstate family-tier lodging and push every family into a
 budget room that does not fit them.
+
+**Ryokan half board is part of the room rate.** Onsen ryokan are overwhelmingly sold 一泊二食 —
+dinner and breakfast included — and the kaiseki dinner is often the reason for the stay. Each
+hotel tier therefore carries both `breakfastIncludedRate` and `dinnerIncludedRate`, credited
+against the party's age-weighted daily food spend. Crediting breakfast alone charged ryokan
+guests twice, once in the room rate and again as though they ate out, which made onsen towns
+look systematically dearer than city hotels. The correction is material rather than cosmetic: it
+moves a two-night Kusatsu trip by roughly ¥10,000 for a family of four.
 
 ## 4. Scoring
 
@@ -97,17 +107,38 @@ configuration, and `affiliate.js` runs only after ranking is fixed. A test asser
 are identical with and without an affiliate ID configured. This is the guard for Risk 4 in
 `docs/competitive-analysis.md`.
 
-## 5. Known limitations
+## 5. Timing advice
+
+The engine holds two facts about every month apart on purpose: what the trip costs
+(`priceIndexByMonth`, applied to air fares and lodging) and how well the month suits what was
+asked for (`interestSeasonality`). `timing.js` costs the same trip in all twelve months and then
+compares the two.
+
+The rule that makes the advice trustworthy is that **a cheaper month is only suggested if it is
+still a suitable month**. Okinawa is cheapest in January, and it is cheapest in January precisely
+because nobody wants to swim then — suggesting it to a family who asked for a beach would be
+arithmetically correct and useless. A candidate month must be at least 90% as seasonally suitable
+as the one requested, and save at least 5%, before it is offered at all. Where two months qualify,
+a shift of one or two months leads over a distant one, because that is a change someone with fixed
+school holidays could actually make.
+
+Nothing shown is a positive signal: it means the month asked for is already the right call. A
+January ski trip to Niseko correctly gets no suggestion.
+
+Suggestions carry the destination's own note for that month where one exists, so a June
+recommendation for Okinawa arrives with its rainy-season caveat attached rather than as a bare
+price.
+
+## 6. Known limitations
 
 Recorded plainly because a cost engine that hides its error bars is worse than one that has them.
 
 1. **Every figure is a seed estimate, not a live price.** This is the single biggest limitation.
    The first fix is the Rakuten Travel API integration described in `docs/data-sources.md` §5.1.
-2. **Ryokan half-board is not modelled.** Many onsen ryokan include dinner as well as breakfast
-   (一泊二食). The engine credits only breakfast, so it overstates food spend at onsen
-   destinations relative to city ones. Relative ranking *within* onsen destinations is unaffected
-   because the bias is uniform, but onsen-versus-city comparisons are skewed against onsen. Fix:
-   add a `dinnerIncludedRate` per hotel tier alongside `breakfastIncludedRate`.
+2. **Included-meal rates are estimates of local norms, not per-property facts.** Half board is
+   now modelled (§3), but `dinnerIncludedRate` describes how common 一泊二食 is in that area and
+   tier, not whether a specific property includes dinner. An individual booking may differ, and
+   the real rate is only knowable per property from a live source.
 3. **Travel times are hand-authored, not routed.** Door-to-door minutes are modelled per route.
    `docs/data-sources.md` §5.14 explains why Google Maps was rejected and what the alternative is.
 4. **Three origins only.** Tokyo, Osaka, and Nagoya. The engine reports an unsupported origin
@@ -120,7 +151,7 @@ Recorded plainly because a cost engine that hides its error bars is worse than o
 7. **No historical price data yet.** The data moat described in the product spec starts the day
    price logging starts, and it cannot be back-filled. Nothing logs prices today.
 
-## 6. Extending it
+## 7. Extending it
 
 **Adding a destination.** Add a record to `engine/data/destinations.js` with access routes for
 each supported origin. The dataset integrity test enforces the record shape, that hotel tiers are
@@ -135,11 +166,11 @@ record. Replace those fields with values from a live source and the scoring laye
 Because of the ~1 rps Rakuten limit documented in `docs/data-sources.md` §4, the integration must
 be a scheduled batch that refreshes cached price bands, never a per-request fan-out.
 
-## 7. Running it
+## 8. Running it
 
 ```bash
 npm start                # serves the site and the engine API
-npm test                 # 73 tests across parser, cost model, scoring, and pipeline
+npm test                 # 96 tests across parser, cost model, scoring, and pipeline
 npm run seo              # regenerates the curated guide pages
 ```
 

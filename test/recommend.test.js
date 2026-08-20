@@ -52,6 +52,20 @@ describe("recommendTrips", () => {
     }
   });
 
+  it("keeps themed picks relevant to what was actually asked for", () => {
+    // Regression: "Best for Families" once answered a beach request with a landlocked highland
+    // resort, because it optimised family suitability while ignoring the stated interest.
+    const result = recommendTrips(parseTripRequest("東京から8月に3泊、大人2人、子供2人で40万円。海。"));
+    const bestInterest = Math.max(...result.ranked.map((recommendation) => recommendation.scores.interest));
+
+    for (const category of result.categories) {
+      assert.ok(
+        category.recommendation.scores.interest >= bestInterest * 0.5,
+        `${category.key} picked ${category.recommendation.destinationId} with interest fit ${category.recommendation.scores.interest}`
+      );
+    }
+  });
+
   it("says plainly when nothing fits the budget instead of pretending", () => {
     const result = recommendTrips(parseTripRequest("東京から9月に3泊、大人2人、子供2人で2万円。海。"));
 
@@ -196,7 +210,14 @@ describe("destination dataset integrity", () => {
       assert.ok(destination.provenance.class, `${destination.id} provenance`);
 
       for (const tierName of ["budget", "standard", "family"]) {
-        assert.ok(destination.hotels[tierName].nightlyPerRoomYen > 0, `${destination.id}.${tierName}`);
+        const tier = destination.hotels[tierName];
+
+        assert.ok(tier.nightlyPerRoomYen > 0, `${destination.id}.${tierName}`);
+
+        for (const field of ["breakfastIncludedRate", "dinnerIncludedRate"]) {
+          assert.equal(typeof tier[field], "number", `${destination.id}.${tierName}.${field} missing`);
+          assert.ok(tier[field] >= 0 && tier[field] <= 1, `${destination.id}.${tierName}.${field} out of range`);
+        }
       }
 
       const originIds = Object.keys(destination.access);
@@ -211,6 +232,15 @@ describe("destination dataset integrity", () => {
           assert.ok(route.label.ja && route.label.en, `${destination.id} route label`);
         }
       }
+    }
+  });
+
+  it("increases included-meal rates with the lodging tier", () => {
+    for (const destination of destinations) {
+      const { budget, standard, family } = destination.hotels;
+
+      assert.ok(budget.dinnerIncludedRate <= standard.dinnerIncludedRate, `${destination.id} dinner rate`);
+      assert.ok(standard.dinnerIncludedRate <= family.dinnerIncludedRate, `${destination.id} dinner rate`);
     }
   });
 

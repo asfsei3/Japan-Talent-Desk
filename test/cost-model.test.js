@@ -120,6 +120,66 @@ describe("estimateTripCost", () => {
     assert.ok(withBreakfast.meals.includedBreakfastCreditYen > 0);
   });
 
+  it("credits an included dinner where half board is the norm", () => {
+    const kusatsu = getDestination("kusatsu");
+    const cost = estimateTripCost(request, kusatsu, kusatsu.access.tokyo[0], kusatsu.hotels.standard);
+
+    assert.ok(kusatsu.hotels.standard.dinnerIncludedRate >= 0.4, "Kusatsu ryokan are sold 一泊二食");
+    assert.ok(cost.meals.includedDinnerCreditYen > cost.meals.includedBreakfastCreditYen);
+    assert.equal(
+      cost.meals.includedMealsCreditYen,
+      cost.meals.includedBreakfastCreditYen + cost.meals.includedDinnerCreditYen
+    );
+  });
+
+  it("barely credits dinner at a city hotel, where it is not included", () => {
+    const kyoto = getDestination("kyoto");
+    const kusatsu = getDestination("kusatsu");
+
+    const cityCost = estimateTripCost(request, kyoto, kyoto.access.tokyo[0], kyoto.hotels.standard);
+    const ryokanCost = estimateTripCost(request, kusatsu, kusatsu.access.tokyo[0], kusatsu.hotels.standard);
+
+    assert.ok(cityCost.meals.includedDinnerCreditYen < ryokanCost.meals.includedDinnerCreditYen / 3);
+  });
+
+  it("stops overstating onsen food spend relative to a city trip", () => {
+    // Regression for the documented bias: crediting only breakfast charged ryokan guests for a
+    // dinner already paid for in the room rate, making onsen towns look dearer than they are.
+    const kusatsu = getDestination("kusatsu");
+    const route = kusatsu.access.tokyo[0];
+
+    const withHalfBoard = estimateTripCost(request, kusatsu, route, kusatsu.hotels.standard);
+    const breakfastOnly = estimateTripCost(request, kusatsu, route, {
+      ...kusatsu.hotels.standard,
+      dinnerIncludedRate: 0,
+    });
+
+    assert.ok(
+      withHalfBoard.meals.yen < breakfastOnly.meals.yen,
+      "half board must reduce modelled food spend"
+    );
+    assert.ok(
+      breakfastOnly.totalYen - withHalfBoard.totalYen > 5000,
+      "the correction should be material, not cosmetic"
+    );
+  });
+
+  it("credits an included meal at the eater's own rate, not an adult's", () => {
+    const kusatsu = getDestination("kusatsu");
+    const route = kusatsu.access.tokyo[0];
+    const twoAdults = parseTripRequest("東京から9月に2泊、大人2人");
+    const twoAdultsTwoKids = parseTripRequest("東京から9月に2泊、大人2人、子供2人（8歳と5歳）");
+
+    const adultsOnly = estimateTripCost(twoAdults, kusatsu, route, kusatsu.hotels.standard);
+    const withChildren = estimateTripCost(twoAdultsTwoKids, kusatsu, route, kusatsu.hotels.standard);
+
+    const perHead = withChildren.meals.includedMealsCreditYen / 4;
+    const perAdult = adultsOnly.meals.includedMealsCreditYen / 2;
+
+    assert.ok(withChildren.meals.includedMealsCreditYen > adultsOnly.meals.includedMealsCreditYen);
+    assert.ok(perHead < perAdult, "a child's included meal should be credited below an adult's");
+  });
+
   it("uses transit instead of a rental car when the party will not drive", () => {
     const noCar = familyRequest({ constraints: { noCar: true, car: false } });
     const cost = estimateTripCost(noCar, okinawa, okinawa.access.tokyo[0], okinawa.hotels.standard);

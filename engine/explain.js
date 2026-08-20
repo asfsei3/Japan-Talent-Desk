@@ -115,21 +115,44 @@ function transportSentence(candidate) {
   };
 }
 
+/**
+ * Describes which meals the room rate is assumed to include.
+ *
+ * Worth saying out loud, because a ryokan sold 一泊二食 looks expensive per night and is often
+ * the cheaper trip once dinner is counted. If the engine quietly relies on that, the user has
+ * no way to sanity-check the number against the room rate they see on a booking site.
+ */
+function includedMealsPhrase(candidate) {
+  const credit = candidate.cost.meals.includedMealsCreditYen ?? 0;
+
+  if (credit <= 0) {
+    return { ja: "", en: "" };
+  }
+
+  const dinnerRate = candidate.tier?.dinnerIncludedRate ?? 0;
+  const halfBoard = dinnerRate >= 0.4;
+
+  if (halfBoard) {
+    return {
+      ja: `このエリアは夕食・朝食付き（一泊二食）のプランが主流で、食費を約${formatYen(credit)}分見込んでいます。`,
+      en: ` Half board (dinner and breakfast) is the norm here, modelled as roughly ${formatYen(credit)} off the food budget.`,
+    };
+  }
+
+  return {
+    ja: `朝食込みのプランが多く、食費を約${formatYen(credit)}分見込んでいます。`,
+    en: ` Breakfast is commonly included, modelled as roughly ${formatYen(credit)} off the food budget.`,
+  };
+}
+
 function hotelSentence(candidate, request) {
   const accommodation = candidate.cost.accommodation;
   const tier = tierLabels[candidate.tierName];
-  const breakfastCredit = candidate.cost.meals.includedBreakfastCreditYen;
-
-  const breakfastJa = breakfastCredit > 0
-    ? `朝食込みのプランが多く、食費を約${formatYen(breakfastCredit)}分抑えられる想定です。`
-    : "";
-  const breakfastEn = breakfastCredit > 0
-    ? ` Breakfast is commonly included, which is modelled as roughly ${formatYen(breakfastCredit)} off the food budget.`
-    : "";
+  const meals = includedMealsPhrase(candidate);
 
   return {
-    ja: `${tier.ja}を${accommodation.rooms}部屋×${request.nights}泊、1泊1部屋あたり約${formatYen(accommodation.nightlyPerRoomYen)}で計算。${breakfastJa}`,
-    en: `Modelled on ${tier.en}: ${accommodation.rooms} room(s) for ${request.nights} night(s) at about ${formatYen(accommodation.nightlyPerRoomYen)} per room per night.${breakfastEn}`,
+    ja: `${tier.ja}を${accommodation.rooms}部屋×${request.nights}泊、1泊1部屋あたり約${formatYen(accommodation.nightlyPerRoomYen)}で計算。${meals.ja}`,
+    en: `Modelled on ${tier.en}: ${accommodation.rooms} room(s) for ${request.nights} night(s) at about ${formatYen(accommodation.nightlyPerRoomYen)} per room per night.${meals.en}`,
   };
 }
 

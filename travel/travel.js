@@ -343,6 +343,38 @@ function renderScores(scores) {
   return container;
 }
 
+/**
+ * Renders the "you could go cheaper by shifting" advice.
+ *
+ * Only appears when the engine found a month that is both meaningfully cheaper and still in
+ * season, so an empty slot here is a positive signal: the month asked for is the right one.
+ */
+function renderTiming(timing) {
+  if (!timing || !timing.suggestion) {
+    return null;
+  }
+
+  const suggestion = timing.suggestion;
+  const box = element("div", "timing");
+
+  const heading = element(
+    "p",
+    "timing-headline",
+    language === "ja"
+      ? `${monthNames.ja[suggestion.month - 1]}なら ${formatYen(suggestion.savingsYen)} 安い`
+      : `${monthNames.en[suggestion.month - 1]} is ${formatYen(suggestion.savingsYen)} cheaper`
+  );
+  box.append(heading);
+
+  box.append(element("p", "timing-body", text(suggestion.message)));
+
+  if (suggestion.note) {
+    box.append(element("p", "timing-note", text(suggestion.note)));
+  }
+
+  return box;
+}
+
 function renderBreakdown(cost) {
   const list = element("dl", "breakdown");
 
@@ -395,6 +427,12 @@ function renderCard(category) {
   card.append(routeLine);
 
   card.append(renderScores(recommendation.scores));
+
+  const timing = renderTiming(recommendation.timing);
+
+  if (timing) {
+    card.append(timing);
+  }
 
   const explain = element("div", "explain");
 

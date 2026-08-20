@@ -12,10 +12,12 @@ import { parseTripRequest } from "./parse-request.js";
 import { recommendTrips } from "./recommend.js";
 import { encodeTrip, decodeTrip } from "./share.js";
 import { affiliateConfigFromEnv, affiliateDisclosure } from "./affiliate.js";
+import { analyzeTiming } from "./timing.js";
 import { destinations, interestTags } from "./data/destinations.js";
 import { origins } from "./data/origins.js";
 
 export { parseTripRequest, recommendTrips, encodeTrip, decodeTrip, affiliateConfigFromEnv, affiliateDisclosure };
+export { analyzeTiming };
 export { destinations, interestTags, origins };
 
 /**

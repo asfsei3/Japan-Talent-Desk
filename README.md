@@ -34,7 +34,8 @@ separate product built on the same Node server. See [Travel Decision Engine](#tr
 │   ├── parse-request.js
 │   ├── recommend.js
 │   ├── scoring.js
-│   └── share.js
+│   ├── share.js
+│   └── timing.js
 ├── scripts/
 │   └── generate-seo-pages.js
 ├── test/
@@ -108,7 +109,8 @@ output, not the input.
 
 It compares every combination of destination, route, and hotel tier on **True Trip Cost** —
 transport, lodging, meals, local transport, activities, and contingency — then ranks them with a
-**Travel Value Score** that adapts its weights to the request.
+**Travel Value Score** that adapts its weights to the request. It also checks whether shifting
+the dates would be cheaper *without going out of season*.
 
 ```text
 "東京から9月の3連休に大人2人、子供2人で15万円以内。海か温泉。移動はできるだけ楽に。"

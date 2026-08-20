@@ -460,6 +460,33 @@ select:focus {
   background: var(--gold-560);
 }
 
+.timing {
+  border: 1px dashed var(--gold-560);
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  background: rgba(184, 148, 85, 0.09);
+}
+
+.timing-headline {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--green-900);
+}
+
+.timing-body {
+  margin-top: 0.3rem;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--ink-760);
+}
+
+.timing-note {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--ink-640);
+}
+
 .explain p {
   font-size: 0.88rem;
   line-height: 1.75;

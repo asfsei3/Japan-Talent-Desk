@@ -86,11 +86,21 @@ export const mealRates = {
 };
 
 /**
- * Value of one included breakfast, per person, as a share of the destination meal index.
- * Used to discount hotels that include breakfast so that "cheaper room" does not
- * automatically win over "slightly dearer room with two included meals".
+ * Value of an included meal, as a share of a day's food spend for the party.
+ *
+ * Used to discount lodging that includes meals, so that "cheaper room" does not automatically
+ * win over "slightly dearer room that feeds you twice".
+ *
+ * Dinner is worth roughly twice breakfast. This matters more in Japan than it would elsewhere:
+ * onsen ryokan are overwhelmingly sold 一泊二食 (dinner and breakfast included), and the
+ * kaiseki dinner is often the point of the stay. Without modelling it, the engine charged
+ * ryokan guests twice — once in the room rate, once again as though they ate out — and
+ * systematically ranked onsen towns as dearer than they are against city hotels.
+ *
+ * The two shares deliberately sum to less than 1: guests still buy lunch, drinks, and snacks.
  */
 export const includedBreakfastShare = 0.22;
+export const includedDinnerShare = 0.42;
 
 /**
  * Activity spend multipliers by requested activity level. Applied to the destination's
