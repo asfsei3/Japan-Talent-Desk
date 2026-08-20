@@ -1,0 +1,109 @@
+/* Extra styles for generated guide pages, layered on /travel/travel.css. */
+
+.guide {
+  padding-block: 2.5rem 1rem;
+}
+
+.guide h1 {
+  font-size: clamp(1.5rem, 3.4vw, 2.2rem);
+  line-height: 1.3;
+}
+
+.guide h2 {
+  margin-top: 2.5rem;
+  font-size: 1.15rem;
+}
+
+.guide h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
+}
+
+.guide .compare {
+  margin-top: 1rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 0;
+  width: 100%;
+  display: table;
+}
+
+.guide .compare th,
+.guide .compare td {
+  white-space: normal;
+}
+
+.guide .compare tr.best td {
+  background: rgba(184, 148, 85, 0.16);
+  font-weight: 600;
+}
+
+.guide-note {
+  margin-top: 0.75rem;
+  color: var(--ink-760);
+  line-height: 1.8;
+  font-size: 0.92rem;
+}
+
+.guide-detail {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  margin-top: 1rem;
+}
+
+.guide-detail p {
+  color: var(--ink-760);
+  line-height: 1.8;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.pros-cons-list {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.pros-cons-list li {
+  list-style: none;
+}
+
+.guide-cta {
+  margin-top: 3rem;
+  background: var(--green-950);
+  color: var(--cream-140);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.guide-cta h2 {
+  margin-top: 0;
+  color: var(--white);
+}
+
+.guide-cta p {
+  margin-top: 0.6rem;
+  line-height: 1.7;
+  font-size: 0.92rem;
+}
+
+.guide-cta .button-primary {
+  display: inline-block;
+  margin-top: 0.5rem;
+  background: var(--gold-560);
+  color: var(--green-980);
+  text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  .guide .compare {
+    font-size: 0.8rem;
+  }
+}
