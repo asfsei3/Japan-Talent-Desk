@@ -52,11 +52,63 @@ const tierLabels = {
   family: { ja: "ファミリー", en: "Family" },
 };
 
+/**
+ * Presets fill the structured fields directly, the way an OTA's "popular searches" row does —
+ * not the free-text box. Each is a partial `collectOverrides()`-shaped object.
+ */
+const quickPresets = {
+  family: {
+    originId: "tokyo",
+    month: 9,
+    nightsPreset: "2",
+    adults: 2,
+    childCount: 2,
+    childAges: [null, null],
+    budgetBand: "150000",
+    interests: ["beach", "onsen"],
+    constraints: { easyTransport: true },
+  },
+  snow: {
+    originId: "osaka",
+    month: 2,
+    nightsPreset: "3",
+    adults: 2,
+    childCount: 0,
+    childAges: [],
+    budgetBand: "200000",
+    interests: ["snow"],
+    constraints: {},
+  },
+  onsen: {
+    originId: "nagoya",
+    month: 11,
+    nightsPreset: "2",
+    adults: 2,
+    childCount: 1,
+    childAges: [5],
+    budgetBand: "150000",
+    interests: ["onsen"],
+    constraints: { noCar: true },
+  },
+};
+
+/** Child age options: 0–17, plus an explicit "unknown" that keeps the child's position. */
+const childAgeMax = 17;
+
 let language = "ja";
 let lastPayload = null;
 let capabilities = null;
 
 const form = document.getElementById("planner");
+const originSelect = document.getElementById("origin");
+const monthSelect = document.getElementById("month");
+const nightsPresetSelect = document.getElementById("nights-preset");
+const nightsCustomInput = document.getElementById("nights-custom");
+const budgetBandSelect = document.getElementById("budget-band");
+const adultsInput = document.getElementById("adults");
+const childCountInput = document.getElementById("child-count");
+const childAgesContainer = document.getElementById("child-ages");
+const childAgesRow = document.getElementById("child-ages-row");
 const textInput = document.getElementById("trip-text");
 const submitButton = document.getElementById("submit-button");
 const statusArea = document.getElementById("status-area");
@@ -116,6 +168,16 @@ function element(tag, className, textContent) {
   return node;
 }
 
+/**
+ * A pure numeric/currency figure, set in the numeric font (AI Orchestra's Inter, reserved for
+ * exactly this) rather than mixed into surrounding Japanese text. Never wrap a JP counter
+ * phrase like "4名" or "2時間30分" in this — those read as one idiomatic unit and splitting the
+ * digit into a different face makes them look more broken, not less.
+ */
+function numSpan(value) {
+  return element("span", "num", value);
+}
+
 /* ---------- Static localisation ---------- */
 
 function applyLanguage() {
@@ -135,15 +197,11 @@ function applyLanguage() {
 /* ---------- Form setup ---------- */
 
 function populateControls(meta) {
-  const originSelect = document.getElementById("origin");
-
   for (const origin of meta.origins) {
     const option = element("option", null, text(origin.name));
     option.value = origin.id;
     originSelect.append(option);
   }
-
-  const monthSelect = document.getElementById("month");
 
   for (let month = 1; month <= 12; month += 1) {
     const option = element("option", null, monthNames[language][month - 1]);
@@ -168,15 +226,163 @@ function populateControls(meta) {
   }
 }
 
+/* ---------- Party size steppers ---------- */
+
+function clampStepperValue(input) {
+  const min = Number(input.min);
+  const max = Number(input.max);
+  const value = Number(input.value);
+
+  if (!Number.isFinite(value)) {
+    return min;
+  }
+
+  return Math.min(max, Math.max(min, Math.round(value)));
+}
+
+function wireSteppers() {
+  form.addEventListener("click", (event) => {
+    const button = event.target.closest(".stepper-btn");
+
+    if (!button) {
+      return;
+    }
+
+    const stepper = button.closest(".stepper");
+    const input = stepper.querySelector("input");
+    input.value = clampStepperValue(input) + Number(button.dataset.step);
+    input.value = clampStepperValue(input);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+
+  for (const input of [adultsInput, childCountInput]) {
+    input.addEventListener("change", () => {
+      input.value = clampStepperValue(input);
+    });
+  }
+
+  childCountInput.addEventListener("input", () => renderChildAgeSelects());
+}
+
+/* ---------- Dynamic child age selects ---------- */
+
+/**
+ * Rebuilds one age <select> per child, keeping any ages already chosen when the count changes
+ * so that growing or shrinking the party doesn't discard what was already picked.
+ *
+ * @param {Array<number|null>} [presetAges] Ages to apply instead of what is already on screen —
+ *   used only when a quick preset or a shared link is filling the form programmatically.
+ */
+function renderChildAgeSelects(presetAges) {
+  const count = clampStepperValue(childCountInput);
+  const existing = presetAges ?? readChildAges();
+
+  childAgesRow.replaceChildren();
+  childAgesContainer.hidden = count === 0;
+
+  for (let index = 0; index < count; index += 1) {
+    const field = element("div", "child-age-field");
+    const label = element(
+      "span",
+      null,
+      language === "ja" ? `${index + 1}人目` : `Child ${index + 1}`
+    );
+    label.dataset.childIndex = String(index);
+
+    const select = document.createElement("select");
+    select.dataset.childAge = String(index);
+
+    const unknown = element("option", null, language === "ja" ? "不明" : "Unknown");
+    unknown.value = "";
+    select.append(unknown);
+
+    for (let age = 0; age <= childAgeMax; age += 1) {
+      const option = element("option", null, language === "ja" ? `${age}歳` : String(age));
+      option.value = String(age);
+      select.append(option);
+    }
+
+    const existingAge = existing[index];
+
+    if (existingAge !== null && existingAge !== undefined) {
+      select.value = String(existingAge);
+    }
+
+    field.append(label, select);
+    childAgesRow.append(field);
+  }
+}
+
+function readChildAges() {
+  return [...childAgesRow.querySelectorAll("[data-child-age]")].map((select) =>
+    select.value === "" ? null : Number(select.value)
+  );
+}
+
+/* ---------- Nights preset ---------- */
+
+function wireNightsPreset() {
+  nightsPresetSelect.addEventListener("change", () => {
+    nightsCustomInput.hidden = nightsPresetSelect.value !== "other";
+
+    if (!nightsCustomInput.hidden) {
+      nightsCustomInput.focus();
+    }
+  });
+}
+
+function readNights() {
+  if (nightsPresetSelect.value === "other") {
+    return Number(nightsCustomInput.value);
+  }
+
+  return Number(nightsPresetSelect.value);
+}
+
+/* ---------- Quick presets ---------- */
+
+function applyPreset(preset) {
+  originSelect.value = preset.originId;
+  monthSelect.value = String(preset.month);
+  nightsPresetSelect.value = preset.nightsPreset;
+  nightsCustomInput.hidden = preset.nightsPreset !== "other";
+  adultsInput.value = preset.adults;
+  childCountInput.value = preset.childCount;
+  budgetBandSelect.value = preset.budgetBand;
+
+  for (const input of document.querySelectorAll("[data-interest]")) {
+    input.checked = preset.interests.includes(input.value);
+  }
+
+  document.getElementById("easy-transport").checked = Boolean(preset.constraints.easyTransport);
+  document.getElementById("no-car").checked = Boolean(preset.constraints.noCar);
+  document.getElementById("stroller").checked = Boolean(preset.constraints.stroller);
+
+  renderChildAgeSelects(preset.childAges);
+  textInput.value = "";
+}
+
+function wireQuickPresets() {
+  document.getElementById("quick-presets").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-preset]");
+
+    if (!button) {
+      return;
+    }
+
+    const preset = quickPresets[button.dataset.preset];
+
+    if (preset) {
+      applyPreset(preset);
+    }
+  });
+}
+
 function collectOverrides() {
   const overrides = {};
-  const originId = document.getElementById("origin").value;
-  const month = document.getElementById("month").value;
-  const nights = document.getElementById("nights").value;
-  const adults = document.getElementById("adults").value;
-  const childCount = document.getElementById("child-count").value;
-  const childAges = document.getElementById("child-ages").value.trim();
-  const budget = document.getElementById("budget").value;
+  const originId = originSelect.value;
+  const month = monthSelect.value;
+  const budget = budgetBandSelect.value;
 
   if (originId) {
     overrides.originId = originId;
@@ -186,25 +392,10 @@ function collectOverrides() {
     overrides.month = Number(month);
   }
 
-  if (nights !== "") {
-    overrides.nights = Number(nights);
-  }
-
-  if (adults !== "") {
-    overrides.adults = Number(adults);
-  }
-
-  if (childCount !== "") {
-    overrides.childCount = Number(childCount);
-  }
-
-  if (childAges) {
-    overrides.childAges = childAges
-      .split(/[,、\s]+/)
-      .filter(Boolean)
-      .map((value) => Number(value))
-      .filter((value) => Number.isFinite(value));
-  }
+  overrides.nights = readNights();
+  overrides.adults = clampStepperValue(adultsInput);
+  overrides.childCount = clampStepperValue(childCountInput);
+  overrides.childAges = readChildAges();
 
   if (budget !== "") {
     overrides.budgetYen = Number(budget);
@@ -245,11 +436,14 @@ function savePreferences() {
   }
 
   const preferences = {
-    originId: document.getElementById("origin").value,
-    adults: document.getElementById("adults").value,
-    childCount: document.getElementById("child-count").value,
-    childAges: document.getElementById("child-ages").value,
-    budgetYen: document.getElementById("budget").value,
+    originId: originSelect.value,
+    month: monthSelect.value,
+    nightsPreset: nightsPresetSelect.value,
+    nightsCustom: nightsCustomInput.value,
+    adults: adultsInput.value,
+    childCount: childCountInput.value,
+    childAges: readChildAges(),
+    budgetBand: budgetBandSelect.value,
   };
 
   try {
@@ -272,12 +466,16 @@ function restorePreferences() {
     return;
   }
 
-  document.getElementById("origin").value = preferences.originId || "";
-  document.getElementById("adults").value = preferences.adults || "";
-  document.getElementById("child-count").value = preferences.childCount || "";
-  document.getElementById("child-ages").value = preferences.childAges || "";
-  document.getElementById("budget").value = preferences.budgetYen || "";
+  originSelect.value = preferences.originId || "";
+  monthSelect.value = preferences.month || "";
+  nightsPresetSelect.value = preferences.nightsPreset || "2";
+  nightsCustomInput.hidden = nightsPresetSelect.value !== "other";
+  nightsCustomInput.value = preferences.nightsCustom || "5";
+  adultsInput.value = preferences.adults || "2";
+  childCountInput.value = preferences.childCount || "0";
+  budgetBandSelect.value = preferences.budgetBand || "";
   document.getElementById("remember").checked = true;
+  renderChildAgeSelects(preferences.childAges || []);
 }
 
 /* ---------- Rendering ---------- */
@@ -290,23 +488,24 @@ function renderSummary(payload) {
 
   const people = request.adults + request.children.length;
   const facts = [
-    [language === "ja" ? "出発地" : "From", originName(request.originId)],
-    [language === "ja" ? "時期" : "Month", request.month ? monthNames[language][request.month - 1] : "—"],
-    [language === "ja" ? "宿泊" : "Nights", String(request.nights)],
-    [language === "ja" ? "人数" : "Party", language === "ja" ? `${people}名` : `${people}`],
-    [language === "ja" ? "予算" : "Budget", request.budgetYen ? formatYen(request.budgetYen) : "—"],
+    [language === "ja" ? "出発地" : "From", originName(request.originId), false],
+    [language === "ja" ? "時期" : "Month", request.month ? monthNames[language][request.month - 1] : "—", false],
+    [language === "ja" ? "宿泊" : "Nights", String(request.nights), true],
+    [language === "ja" ? "人数" : "Party", language === "ja" ? `${people}名` : `${people}`, false],
+    [language === "ja" ? "予算" : "Budget", request.budgetYen ? formatYen(request.budgetYen) : "—", Boolean(request.budgetYen)],
     [
       language === "ja" ? "検討数" : "Compared",
       language === "ja"
         ? `${result.consideredDestinations}件 / ${result.consideredConfigurations}通り`
         : `${result.consideredDestinations} destinations, ${result.consideredConfigurations} combinations`,
+      false,
     ],
   ];
 
-  for (const [label, value] of facts) {
+  for (const [label, value, isNumeric] of facts) {
     const item = element("span");
     item.append(`${label}: `);
-    item.append(element("strong", null, value));
+    item.append(element("strong", isNumeric ? "num" : null, value));
     summaryElement.append(item);
   }
 
@@ -336,7 +535,7 @@ function renderScores(scores) {
     const bar = element("span");
     bar.style.width = `${Math.max(0, Math.min(100, value))}%`;
     meter.append(bar);
-    row.append(meter, element("span", null, String(value)));
+    row.append(meter, element("span", "num", String(value)));
     container.append(row);
   }
 
@@ -357,13 +556,14 @@ function renderTiming(timing) {
   const suggestion = timing.suggestion;
   const box = element("div", "timing");
 
-  const heading = element(
-    "p",
-    "timing-headline",
-    language === "ja"
-      ? `${monthNames.ja[suggestion.month - 1]}なら ${formatYen(suggestion.savingsYen)} 安い`
-      : `${monthNames.en[suggestion.month - 1]} is ${formatYen(suggestion.savingsYen)} cheaper`
-  );
+  const heading = element("p", "timing-headline");
+
+  if (language === "ja") {
+    heading.append(`${monthNames.ja[suggestion.month - 1]}なら `, numSpan(formatYen(suggestion.savingsYen)), " 安い");
+  } else {
+    heading.append(`${monthNames.en[suggestion.month - 1]} is `, numSpan(formatYen(suggestion.savingsYen)), " cheaper");
+  }
+
   box.append(heading);
 
   box.append(element("p", "timing-body", text(suggestion.message)));
@@ -380,7 +580,7 @@ function renderBreakdown(cost) {
 
   for (const line of cost.breakdown) {
     const row = element("div");
-    row.append(element("dt", null, text(breakdownLabels[line.key])), element("dd", null, formatYen(line.yen)));
+    row.append(element("dt", null, text(breakdownLabels[line.key])), element("dd", "num", formatYen(line.yen)));
     list.append(row);
   }
 
@@ -399,16 +599,15 @@ function renderCard(category) {
   card.append(heading);
 
   const priceBlock = element("div");
-  priceBlock.append(element("p", "price", formatYen(recommendation.cost.totalYen)));
-  priceBlock.append(
-    element(
-      "p",
-      "price-range",
-      `${formatYen(recommendation.cost.rangeYen.low)} – ${formatYen(recommendation.cost.rangeYen.high)} · ${
-        language === "ja" ? "1人あたり" : "per person"
-      } ${formatYen(recommendation.cost.perPersonYen)}`
-    )
+  priceBlock.append(element("p", "price num", formatYen(recommendation.cost.totalYen)));
+
+  const priceRange = element("p", "price-range");
+  priceRange.append(
+    numSpan(`${formatYen(recommendation.cost.rangeYen.low)} – ${formatYen(recommendation.cost.rangeYen.high)}`),
+    ` · ${language === "ja" ? "1人あたり" : "per person"} `,
+    numSpan(formatYen(recommendation.cost.perPersonYen))
   );
+  priceBlock.append(priceRange);
 
   if (recommendation.withinBudget === false) {
     priceBlock.append(element("p", "over-budget", language === "ja" ? "予算オーバー" : "Over budget"));
@@ -508,12 +707,18 @@ function renderCompareTable(ranked) {
   for (const recommendation of ranked) {
     const row = element("tr");
     row.append(element("td", null, text(recommendation.name)));
-    row.append(element("td", "numeric", formatYen(recommendation.cost.totalYen)));
+    row.append(element("td", "numeric num", formatYen(recommendation.cost.totalYen)));
     row.append(element("td", "numeric", formatDuration(recommendation.route.doorToDoorMinutes)));
-    row.append(element("td", "numeric", String(recommendation.route.transfers)));
+    row.append(element("td", "numeric num", String(recommendation.route.transfers)));
     row.append(element("td", null, tierName(recommendation.tierName)));
-    row.append(element("td", "numeric", String(recommendation.scores.travelValue)));
-    row.append(element("td", "numeric", recommendation.scores.family === null ? "—" : String(recommendation.scores.family)));
+    row.append(element("td", "numeric num", String(recommendation.scores.travelValue)));
+    row.append(
+      element(
+        "td",
+        recommendation.scores.family === null ? "numeric" : "numeric num",
+        recommendation.scores.family === null ? "—" : String(recommendation.scores.family)
+      )
+    );
     body.append(row);
   }
 
@@ -634,19 +839,13 @@ form.addEventListener("submit", (event) => {
   requestPlan({ text: textInput.value, overrides: collectOverrides() });
 });
 
-document.getElementById("examples").addEventListener("click", (event) => {
-  const button = event.target.closest("[data-example]");
-
-  if (!button) {
-    return;
-  }
-
-  textInput.value = button.dataset.example;
-  textInput.focus();
-});
+wireSteppers();
+wireNightsPreset();
+wireQuickPresets();
 
 languageToggle.addEventListener("click", () => {
   language = language === "ja" ? "en" : "ja";
+  renderChildAgeSelects(readChildAges());
   applyLanguage();
 });
 
@@ -660,9 +859,10 @@ async function init() {
       populateControls(meta);
     }
   } catch {
-    // The form still works from free text alone if the metadata call fails.
+    // The form still works with the built-in defaults if the metadata call fails.
   }
 
+  renderChildAgeSelects();
   restorePreferences();
   applyLanguage();
 

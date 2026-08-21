@@ -149,6 +149,14 @@ describe("parseTripRequest", () => {
     assert.ok(request.assumptions.some((assumption) => assumption.code === "adults-default"));
   });
 
+  it("keeps a child's position when their age is unknown but siblings' are known", () => {
+    // Regression: filtering out null ages before assigning them positionally shifted every
+    // known age after the gap into the wrong child's slot.
+    const request = parseTripRequest("東京から2泊", { childCount: 3, childAges: [8, null, 5] });
+
+    assert.deepEqual(request.children.map((child) => child.age), [8, null, 5]);
+  });
+
   it("ignores unknown interest tags supplied through overrides", () => {
     const request = parseTripRequest("東京から2泊", { interests: ["beach", "__proto__", "nonsense"] });
 

@@ -143,9 +143,9 @@ function renderMonthlyTable(rows) {
     .map(
       (row) => `        <tr${row.cheapest ? ' class="best"' : ""}>
           <td>${monthNames[row.month - 1]}</td>
-          <td class="numeric">${formatYen(row.totalYen)}</td>
-          <td class="numeric">${formatYen(row.transportYen)}</td>
-          <td class="numeric">${formatYen(row.accommodationYen)}</td>
+          <td class="numeric num">${formatYen(row.totalYen)}</td>
+          <td class="numeric num">${formatYen(row.transportYen)}</td>
+          <td class="numeric num">${formatYen(row.accommodationYen)}</td>
           <td>${escapeHtml(row.note)}</td>
         </tr>`
     )
@@ -167,11 +167,11 @@ function renderRankingTable(ranked) {
       (recommendation) => `        <tr>
           <td>${escapeHtml(recommendation.name.ja)}</td>
           <td>${escapeHtml(recommendation.prefecture.ja)}</td>
-          <td class="numeric">${formatYen(recommendation.cost.totalYen)}</td>
+          <td class="numeric num">${formatYen(recommendation.cost.totalYen)}</td>
           <td class="numeric">${formatDuration(recommendation.route.doorToDoorMinutes)}</td>
-          <td class="numeric">${recommendation.route.transfers}</td>
-          <td class="numeric">${recommendation.scores.travelValue}</td>
-          <td class="numeric">${recommendation.scores.family === null ? "—" : recommendation.scores.family}</td>
+          <td class="numeric num">${recommendation.route.transfers}</td>
+          <td class="numeric num">${recommendation.scores.travelValue}</td>
+          <td class="numeric${recommendation.scores.family === null ? "" : " num"}">${recommendation.scores.family === null ? "—" : recommendation.scores.family}</td>
         </tr>`
     )
     .join("\n");

@@ -397,17 +397,20 @@ export function parseTripRequest(text, overrides = {}) {
   const childCount = clampInteger(overrides.childCount ?? party.childCount ?? 0, limits.childCount) ?? 0;
   const overrideAges = Array.isArray(overrides.childAges) ? overrides.childAges : undefined;
   const rawAges = overrideAges ?? party.ages;
-  const parsedAges = rawAges
-    .slice(0, limits.childCount.max)
-    .map((age) => clampInteger(age, limits.childAge))
-    .filter((age) => age !== null);
+
+  // Positions matter: an override can state "8, unknown, 5" for three children, and the
+  // unknown middle child must stay at index 1. Filtering nulls out here would shift the
+  // known ages into the wrong children's slots instead of leaving a genuine gap.
+  const parsedAges = rawAges.slice(0, limits.childCount.max).map((age) => clampInteger(age, limits.childAge));
   const children = [];
 
   for (let index = 0; index < childCount; index += 1) {
     children.push({ age: parsedAges[index] ?? null });
   }
 
-  if (childCount > 0 && parsedAges.length === 0) {
+  const knownAgeCount = parsedAges.filter((age) => age !== null).length;
+
+  if (childCount > 0 && knownAgeCount === 0) {
     assumptions.push({
       code: "child-ages-unknown",
       ja: "子どもの年齢が不明なため、運賃・宿泊の子ども料金は標準的な想定で計算しました。年齢を入れると精度が上がります。",
