@@ -1,0 +1,798 @@
+/*
+ * Travel Decision Engine — self-contained styles.
+ *
+ * Palette and type follow AI Orchestra's own design system (public/css/design-system.css in
+ * the ai-orchestra repo): deep green for structure and trust, champagne gold reserved for the
+ * primary action and positive figures. Variable names below are kept from this file's original
+ * JTD-derived palette to avoid touching every selector; only the values were re-pointed to AI
+ * Orchestra's real tokens, several of them exact matches (--color-border, --color-text-secondary,
+ * --color-text-muted, --color-gold, --color-hero-bg).
+ *
+ * Type follows AI Orchestra's real two-font system, which matters more than it sounds: their
+ * body font is 'Noto Sans JP' ALONE (--font-base), and 'Inter' (--font-en) is reserved for
+ * numeric/price figures only, applied via a marker class rather than mixed into running text.
+ * Mixing the two into one stack — an earlier mistake here — makes digits inside Japanese
+ * sentences render in a different font from the surrounding text, which reads as broken.
+ */
+
+:root {
+  --green-980: #0d2b1e; /* AI Orchestra --color-hero-bg */
+  --green-950: #0d2b1e; /* AI Orchestra --color-hero-bg */
+  --green-900: #1a4731; /* AI Orchestra --color-heading */
+  --green-820: #143a29; /* darker step of --color-heading, for hover */
+  --green-720: #1a4731; /* AI Orchestra --color-heading, reused for meters/markers */
+  --gold-560: #c9a84c; /* AI Orchestra --color-gold */
+  --gold-420: #c9a84c; /* AI Orchestra --color-gold */
+  --cream-100: #f5f0e8; /* AI Orchestra --color-bg */
+  --cream-140: #f5f0e8; /* AI Orchestra --color-bg */
+  --cream-180: #ece3d2; /* one step down from --color-bg, for hover */
+  --ink-980: #0d2b1e; /* AI Orchestra --color-text */
+  --ink-760: rgba(13, 43, 30, 0.72); /* AI Orchestra --color-text-secondary, exact */
+  --ink-640: rgba(13, 43, 30, 0.55); /* AI Orchestra --color-text-muted, exact */
+  --loss: #c0392b; /* AI Orchestra --color-loss */
+  --line: rgba(26, 71, 49, 0.12); /* AI Orchestra --color-border, exact */
+  --white: #ffffff; /* AI Orchestra --color-white */
+  --shadow-soft: 0 18px 40px rgba(13, 43, 30, 0.1);
+  --font-base: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif; /* AI Orchestra --font-base */
+  --font-en: "Inter", "Noto Sans JP", sans-serif; /* AI Orchestra --font-en, numeric contexts only */
+  color-scheme: light;
+  font-family: var(--font-base);
+}
+
+/* Numeric/price figures only — mirrors AI Orchestra's .font-en / .price-number markers. */
+.num {
+  font-family: var(--font-en);
+  font-variant-numeric: tabular-nums;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--cream-100);
+  color: var(--ink-980);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p,
+figure {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+.wrap {
+  width: min(1120px, 100% - 2.5rem);
+  margin-inline: auto;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+}
+
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  background: var(--white);
+  padding: 0.5rem 0.75rem;
+  z-index: 10;
+}
+
+/* Header */
+
+.topbar {
+  background: var(--green-950);
+  color: var(--cream-140);
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 1rem;
+}
+
+.brand {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.lang-toggle {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.lang-toggle:hover {
+  border-color: var(--gold-420);
+  color: var(--gold-420);
+}
+
+/* Hero */
+
+.hero {
+  padding-block: 3rem 2rem;
+  max-width: 46rem;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--gold-560);
+  font-weight: 600;
+}
+
+.hero h1 {
+  margin-top: 0.75rem;
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.lead {
+  margin-top: 1rem;
+  color: var(--ink-760);
+  line-height: 1.75;
+}
+
+/* Planner form */
+
+.planner {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+}
+
+textarea,
+input,
+select {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 0.7rem 0.85rem;
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.7;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  outline: 2px solid var(--green-720);
+  outline-offset: 1px;
+}
+
+/* Quick presets — set the structured fields directly, the way an OTA's "popular searches" row does. */
+
+.quick-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.quick-presets-label {
+  font-size: 0.82rem;
+  color: var(--ink-640);
+  white-space: nowrap;
+}
+
+.quick-preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.quick-preset-buttons button {
+  font: inherit;
+  font-size: 0.82rem;
+  background: var(--cream-140);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+  color: var(--ink-760);
+}
+
+.quick-preset-buttons button:hover {
+  background: var(--cream-180);
+  color: var(--ink-980);
+}
+
+/* Search grid — the primary, selection-based entry, styled like a familiar OTA search widget. */
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.85rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--ink-760);
+}
+
+.field select,
+.field input[type="number"] {
+  cursor: pointer;
+}
+
+#nights-custom {
+  margin-top: 0.35rem;
+  cursor: text;
+}
+
+.field-stepper {
+  gap: 0.35rem;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--white);
+  height: 46px;
+}
+
+.stepper-btn {
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--cream-140);
+  border: 0;
+  color: var(--green-900);
+  cursor: pointer;
+  width: 2.4rem;
+}
+
+.stepper-btn:hover {
+  background: var(--cream-180);
+}
+
+.stepper input {
+  border: 0;
+  text-align: center;
+  font: inherit;
+  font-weight: 600;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  /* Numeric party/night counts read as figures, so they take the numeric font like prices do. */
+  font-family: var(--font-en);
+  font-variant-numeric: tabular-nums;
+}
+
+.stepper input:focus {
+  outline: none;
+}
+
+.stepper input::-webkit-outer-spin-button,
+.stepper input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stepper input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.child-ages {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+}
+
+.field-note {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--ink-640);
+  margin-bottom: 0.5rem;
+}
+
+.child-ages-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.child-age-field {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--ink-640);
+}
+
+.free-text-fallback {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+
+.free-text-fallback summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--green-820);
+}
+
+.free-text-fallback textarea {
+  margin-top: 0.6rem;
+}
+
+.interests {
+  border: 0;
+  padding: 0;
+  margin: 1.25rem 0 0;
+}
+
+.interests legend {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-760);
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.32rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background: var(--white);
+}
+
+.chip:has(input:checked) {
+  background: var(--green-900);
+  color: var(--cream-140);
+  border-color: var(--green-900);
+}
+
+.chip input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--gold-560);
+}
+
+.planner-actions {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.button-primary {
+  font: inherit;
+  font-weight: 600;
+  background: var(--gold-560);
+  color: var(--white);
+  border: 0;
+  border-radius: 999px;
+  padding: 0.75rem 1.7rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.button-primary:hover {
+  opacity: 0.88;
+}
+
+.button-primary[disabled] {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--ink-640);
+  width: auto;
+}
+
+.remember input {
+  width: auto;
+}
+
+/* Status and results */
+
+.notice {
+  margin-top: 1.5rem;
+  border-left: 3px solid var(--gold-560);
+  background: var(--cream-140);
+  padding: 0.9rem 1.1rem;
+  border-radius: 0 9px 9px 0;
+  line-height: 1.7;
+  font-size: 0.92rem;
+}
+
+.notice.error {
+  border-left-color: var(--loss);
+}
+
+.results {
+  padding-block: 2.5rem 1rem;
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  padding: 1rem 1.15rem;
+  background: var(--green-950);
+  color: var(--cream-140);
+  border-radius: 12px;
+  font-size: 0.88rem;
+}
+
+.summary strong {
+  color: var(--white);
+}
+
+.summary-notes {
+  width: 100%;
+  margin-top: 0.4rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.section-heading {
+  margin-top: 2.75rem;
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.15rem;
+  margin-top: 1.5rem;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.card-tag {
+  align-self: flex-start;
+  background: var(--gold-560);
+  color: var(--green-980);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+}
+
+.card h3 {
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+
+.card .prefecture {
+  font-size: 0.8rem;
+  color: var(--ink-640);
+}
+
+.price {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.price-range {
+  font-size: 0.8rem;
+  color: var(--ink-640);
+}
+
+.over-budget {
+  color: var(--loss);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.breakdown {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding-block: 0.7rem;
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.breakdown div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.breakdown dt {
+  color: var(--ink-640);
+}
+
+.scores {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr 2rem;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-640);
+}
+
+.meter {
+  height: 6px;
+  background: var(--cream-180);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  background: var(--green-720);
+  border-radius: 999px;
+}
+
+.meter.headline span {
+  background: var(--gold-560);
+}
+
+.timing {
+  border: 1px dashed var(--gold-560);
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  background: rgba(184, 148, 85, 0.09);
+}
+
+.timing-headline {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--green-900);
+}
+
+.timing-body {
+  margin-top: 0.3rem;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--ink-760);
+}
+
+.timing-note {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--ink-640);
+}
+
+.explain p {
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: var(--ink-760);
+  margin-bottom: 0.55rem;
+}
+
+.pros-cons {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.pros-cons li {
+  list-style: none;
+}
+
+.pros-cons ul {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.pro::before {
+  content: "＋ ";
+  color: var(--gold-560);
+  font-weight: 700;
+}
+
+.con::before {
+  content: "− ";
+  color: var(--loss);
+  font-weight: 700;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: auto;
+  padding-top: 0.3rem;
+}
+
+.links a {
+  font-size: 0.82rem;
+  border: 1px solid var(--green-900);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  text-decoration: none;
+  color: var(--green-900);
+}
+
+.links a:hover {
+  background: var(--green-900);
+  color: var(--cream-100);
+}
+
+.alternatives {
+  font-size: 0.78rem;
+  color: var(--ink-640);
+  line-height: 1.6;
+}
+
+/* Comparison table */
+
+.table-scroll {
+  overflow-x: auto;
+  margin-top: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.compare {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.87rem;
+  min-width: 44rem;
+}
+
+.compare th,
+.compare td {
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.compare thead th {
+  background: var(--cream-140);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-640);
+}
+
+.compare tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.compare .numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Share and footer */
+
+.share {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.87rem;
+}
+
+.share input {
+  flex: 1 1 22rem;
+  font-size: 0.82rem;
+}
+
+.share button {
+  font: inherit;
+  font-size: 0.85rem;
+  border: 1px solid var(--green-900);
+  background: transparent;
+  color: var(--green-900);
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  cursor: pointer;
+  width: auto;
+}
+
+.disclaimer {
+  padding-block: 2.5rem 3rem;
+  max-width: 46rem;
+}
+
+.disclaimer h2 {
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.disclaimer p {
+  color: var(--ink-760);
+  line-height: 1.75;
+  font-size: 0.9rem;
+}
+
+.fine {
+  font-size: 0.8rem;
+  color: var(--ink-640);
+  margin-top: 0.75rem;
+}
+
+.site-footer {
+  background: var(--green-950);
+  color: rgba(255, 255, 255, 0.7);
+  padding-block: 1.5rem;
+}
+
+.site-footer .fine {
+  color: inherit;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .planner {
+    padding: 1.1rem;
+  }
+
+  .score-row {
+    grid-template-columns: 5.5rem 1fr 2rem;
+  }
+}

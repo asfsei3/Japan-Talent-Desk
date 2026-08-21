@@ -3,6 +3,13 @@ import { request as httpsRequest } from "node:https";
 import { extname, join, normalize } from "node:path";
 import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
+import {
+  affiliateConfigFromEnv,
+  affiliateDisclosure,
+  decodeTrip,
+  engineCapabilities,
+  planTrip,
+} from "./engine/index.js";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const envPath = join(root, ".env");
@@ -276,10 +283,82 @@ async function handleNewsletterSignup(request, response) {
   }
 }
 
-createServer((request, response) => {
-  const path = (request.url || "/").split("?")[0];
+const MAX_TRIP_TEXT_LENGTH = 2000;
 
-  if (path === config.basePath || path.startsWith(`${config.basePath}/`)) {
+function respondWithPlan(response, text, overrides) {
+  const plan = planTrip(text, {
+    overrides,
+    affiliateConfig: affiliateConfigFromEnv(),
+  });
+
+  sendJson(response, 200, {
+    ok: true,
+    request: plan.request,
+    result: plan.result,
+    shareToken: plan.shareToken,
+    disclosure: affiliateDisclosure,
+  });
+}
+
+async function handleTravelPlan(request, response) {
+  let payload;
+
+  try {
+    const rawBody = await readRequestBody(request);
+    payload = JSON.parse(rawBody || "{}");
+  } catch {
+    sendJson(response, 400, { ok: false, message: "Invalid request body." });
+    return;
+  }
+
+  const text = String(payload.text || "").slice(0, MAX_TRIP_TEXT_LENGTH).trim();
+  const overrides = payload.overrides && typeof payload.overrides === "object" ? payload.overrides : {};
+
+  if (!text && Object.keys(overrides).length === 0) {
+    sendJson(response, 400, {
+      ok: false,
+      message: "旅行の希望を入力してください。 / Please describe the trip you want.",
+    });
+    return;
+  }
+
+  respondWithPlan(response, text, overrides);
+}
+
+function handleSharedTrip(response, token) {
+  const overrides = decodeTrip(token);
+
+  if (!overrides) {
+    sendJson(response, 404, { ok: false, message: "この共有リンクは読み取れませんでした。 / This shared link could not be read." });
+    return;
+  }
+
+  respondWithPlan(response, "", overrides);
+}
+
+createServer((request, response) => {
+  const requestPath = (request.url || "/").split("?")[0];
+
+  if (request.method === "POST" && requestPath === "/api/travel/plan") {
+    handleTravelPlan(request, response).catch((error) => {
+      console.error("Trip planning failed unexpectedly:", error);
+      sendJson(response, 500, { ok: false, message: "Trip planning failed unexpectedly." });
+    });
+    return;
+  }
+
+  if (request.method === "GET" && requestPath === "/api/travel/plan") {
+    const token = new URLSearchParams((request.url || "").split("?")[1] || "").get("t");
+    handleSharedTrip(response, token);
+    return;
+  }
+
+  if (request.method === "GET" && requestPath === "/api/travel/meta") {
+    sendJson(response, 200, { ok: true, ...engineCapabilities() });
+    return;
+  }
+
+  if (requestPath === config.basePath || requestPath.startsWith(`${config.basePath}/`)) {
     getIntelHandler()
       .then((handler) => {
         if (!handler) {
@@ -324,5 +403,5 @@ createServer((request, response) => {
   });
   createReadStream(filePath).pipe(response);
 }).listen(port, () => {
-  console.log(`Japan Talent Desk site on port ${port} · intelligence mounted at ${config.basePath}`);
+  console.log(`Japan Talent Desk site + Travel Decision Engine running on port ${port} · JFI mounted at ${config.basePath}`);
 });

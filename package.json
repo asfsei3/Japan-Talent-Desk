@@ -10,10 +10,11 @@
     "pipeline": "node --disable-warning=ExperimentalWarning src/cli.js pipeline",
     "daily": "node --disable-warning=ExperimentalWarning src/cli.js daily",
     "weekly": "node --disable-warning=ExperimentalWarning src/cli.js weekly",
-    "test": "node --disable-warning=ExperimentalWarning --test \"test/**/*.test.js\""
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/**/*.test.js\"",
+    "seo": "node scripts/generate-seo-pages.js"
   },
   "engines": {
     "node": ">=22.5"
   },
-  "description": "Japan Football Intelligence platform and the Japan Talent Desk public site."
+  "description": "Japan Football Intelligence platform, the Travel Decision Engine, and the Japan Talent Desk public site."
 }

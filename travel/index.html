@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="予算・日程・家族構成を入れるだけで、交通・宿・食事・現地交通を全部足した「本当の総額」で行き先を比較する旅行決定エンジン。"
+    />
+    <meta name="theme-color" content="#0f241b" />
+    <title>旅行決定エンジン | Travel Decision Engine</title>
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/travel/travel.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">本文へスキップ</a>
+
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="/travel/">旅行決定エンジン</a>
+        <button type="button" class="lang-toggle" id="lang-toggle" aria-pressed="false">EN</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero wrap">
+        <p class="eyebrow" data-ja="意思決定のための旅行エンジン" data-en="A decision engine for travel">意思決定のための旅行エンジン</p>
+        <h1
+          data-ja="旅行の面倒な比較を全部やって、最適な旅行を決める"
+          data-en="We do the tedious comparison and decide the trip for you"
+        >
+          旅行の面倒な比較を全部やって、最適な旅行を決める
+        </h1>
+        <p
+          class="lead"
+          data-ja="行き先は「入力」ではなく「答え」です。予算と家族構成を入れるだけで、交通・宿・食事・現地交通・アクティビティを全部足した本当の総額で行き先を比較します。"
+          data-en="The destination is the answer, not the input. Give us a budget and who is travelling, and we compare destinations on the true total: transport, lodging, food, local transport, and activities."
+        >
+          行き先は「入力」ではなく「答え」です。予算と家族構成を入れるだけで、交通・宿・食事・現地交通・アクティビティを全部足した本当の総額で行き先を比較します。
+        </p>
+      </section>
+
+      <section class="wrap">
+        <form class="planner" id="planner">
+          <div class="quick-presets" id="quick-presets" aria-label="よくある条件">
+            <span class="quick-presets-label" data-ja="よくある条件から" data-en="Start from a common trip">よくある条件から</span>
+            <div class="quick-preset-buttons">
+              <button type="button" data-preset="family">東京・家族4人・15万円</button>
+              <button type="button" data-preset="snow">大阪・雪・20万円</button>
+              <button type="button" data-preset="onsen">名古屋・温泉・車なし</button>
+            </div>
+          </div>
+
+          <div class="search-grid">
+            <label class="field">
+              <span data-ja="出発地" data-en="Departure">出発地</span>
+              <select name="originId" id="origin" required>
+                <option value="" disabled selected data-ja="選択してください" data-en="Please select">選択してください</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span data-ja="出発時期" data-en="When">出発時期</span>
+              <select name="month" id="month">
+                <option value="" data-ja="まだ決めていない" data-en="Not decided yet">まだ決めていない</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span data-ja="泊数" data-en="Length">泊数</span>
+              <select id="nights-preset">
+                <option value="0" data-ja="日帰り" data-en="Day trip">日帰り</option>
+                <option value="1" data-ja="1泊2日" data-en="1 night">1泊2日</option>
+                <option value="2" selected data-ja="2泊3日" data-en="2 nights">2泊3日</option>
+                <option value="3" data-ja="3泊4日" data-en="3 nights">3泊4日</option>
+                <option value="4" data-ja="4泊5日" data-en="4 nights">4泊5日</option>
+                <option value="other" data-ja="5泊以上（指定する）" data-en="5+ nights (specify)">5泊以上（指定する）</option>
+              </select>
+              <input type="number" id="nights-custom" min="5" max="30" value="5" hidden />
+            </label>
+
+            <label class="field">
+              <span data-ja="予算のめやす" data-en="Budget">予算のめやす</span>
+              <select id="budget-band">
+                <option value="" data-ja="指定しない" data-en="Not specified">指定しない</option>
+                <option value="50000" data-ja="〜5万円" data-en="Up to ¥50,000">〜5万円</option>
+                <option value="80000" data-ja="〜8万円" data-en="Up to ¥80,000">〜8万円</option>
+                <option value="100000" data-ja="〜10万円" data-en="Up to ¥100,000">〜10万円</option>
+                <option value="150000" selected data-ja="〜15万円" data-en="Up to ¥150,000">〜15万円</option>
+                <option value="200000" data-ja="〜20万円" data-en="Up to ¥200,000">〜20万円</option>
+                <option value="300000" data-ja="〜30万円" data-en="Up to ¥300,000">〜30万円</option>
+                <option value="1000000" data-ja="30万円〜（柔軟）" data-en="¥300,000+ (flexible)">30万円〜（柔軟）</option>
+              </select>
+            </label>
+
+            <div class="field field-stepper">
+              <span data-ja="大人" data-en="Adults">大人</span>
+              <div class="stepper" data-stepper-for="adults">
+                <button type="button" class="stepper-btn" data-step="-1" aria-label="減らす">−</button>
+                <input type="number" id="adults" min="1" max="12" value="2" inputmode="numeric" />
+                <button type="button" class="stepper-btn" data-step="1" aria-label="増やす">＋</button>
+              </div>
+            </div>
+
+            <div class="field field-stepper">
+              <span data-ja="子ども" data-en="Children">子ども</span>
+              <div class="stepper" data-stepper-for="child-count">
+                <button type="button" class="stepper-btn" data-step="-1" aria-label="減らす">−</button>
+                <input type="number" id="child-count" min="0" max="10" value="0" inputmode="numeric" />
+                <button type="button" class="stepper-btn" data-step="1" aria-label="増やす">＋</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="child-ages" id="child-ages" hidden>
+            <span class="field-note" data-ja="お子さまの年齢" data-en="Children's ages">お子さまの年齢</span>
+            <div class="child-ages-row" id="child-ages-row"></div>
+          </div>
+
+          <fieldset class="interests">
+            <legend data-ja="したいこと" data-en="What you want">したいこと</legend>
+            <div class="chips" id="interest-chips"></div>
+          </fieldset>
+
+          <fieldset class="interests">
+            <legend data-ja="条件" data-en="Constraints">条件</legend>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" id="easy-transport" /><span data-ja="移動は楽に" data-en="Easy travel">移動は楽に</span></label>
+              <label class="chip"><input type="checkbox" id="no-car" /><span data-ja="運転しない" data-en="No driving">運転しない</span></label>
+              <label class="chip"><input type="checkbox" id="stroller" /><span data-ja="ベビーカー" data-en="Stroller">ベビーカー</span></label>
+            </div>
+          </fieldset>
+
+          <details class="free-text-fallback">
+            <summary data-ja="文章で伝える（任意）" data-en="Describe it in your own words (optional)">
+              文章で伝える（任意）
+            </summary>
+            <p class="field-note" data-ja="人数・泊数・予算など上の項目はこの文章より優先されます。ここには「したいこと」の補足だけを書いてください。" data-en="Fields above (party size, nights, budget, etc.) take priority over anything written here — use this box only to add extra detail about what you want.">
+              人数・泊数・予算など上の項目はこの文章より優先されます。ここには「したいこと」の補足だけを書いてください。
+            </p>
+            <textarea
+              id="trip-text"
+              name="text"
+              rows="3"
+              placeholder="例：東京から9月の3連休に大人2人、子供2人で15万円以内。海か温泉。移動はできるだけ楽に。"
+            ></textarea>
+          </details>
+
+          <div class="planner-actions">
+            <button type="submit" class="button-primary" id="submit-button" data-ja="行き先を決める" data-en="Decide the destination">
+              行き先を決める
+            </button>
+            <label class="remember">
+              <input type="checkbox" id="remember" />
+              <span data-ja="この条件を次回も使う" data-en="Remember these settings">この条件を次回も使う</span>
+            </label>
+          </div>
+        </form>
+      </section>
+
+      <section class="wrap" id="status-area" hidden>
+        <div class="notice" id="status-message"></div>
+      </section>
+
+      <section class="wrap results" id="results" hidden>
+        <div class="summary" id="summary"></div>
+        <div class="category-grid" id="categories"></div>
+
+        <h2 class="section-heading" data-ja="全候補の比較" data-en="All candidates compared">全候補の比較</h2>
+        <div class="table-scroll">
+          <table class="compare" id="compare"></table>
+        </div>
+
+        <div class="share" id="share"></div>
+      </section>
+
+      <section class="wrap disclaimer">
+        <h2 data-ja="この数字について" data-en="About these numbers">この数字について</h2>
+        <p
+          id="provenance-note"
+          data-ja="表示している金額と所要時間は、独自に整備したデータをもとにした概算です。実際の価格ではありません。予約前に必ず各予約サイトでご確認ください。"
+          data-en="Prices and travel times shown are estimates from our own curated dataset, not live prices. Always confirm at the booking provider before booking."
+        >
+          表示している金額と所要時間は、独自に整備したデータをもとにした概算です。実際の価格ではありません。予約前に必ず各予約サイトでご確認ください。
+        </p>
+        <p class="fine" id="disclosure"></p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p class="fine">Travel Decision Engine — MVP</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/travel/travel.js"></script>
+  </body>
+</html>
