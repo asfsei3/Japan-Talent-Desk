@@ -1,17 +1,19 @@
 /**
  * The HTML document shell.
  *
- * Server-rendered strings, no build step, no client framework. The only external
- * request is the Google Fonts stylesheet the Japan Talent Desk landing page
- * already loads — no CJK webfont is added, because the file weight is not worth
- * it when every target device has a good system Japanese face.
+ * Server-rendered strings, no build step, no client framework. Fonts and
+ * colour tokens are copied from AI Orchestra's design system
+ * (asfsei3/ai-orchestra, public/css/design-system.css) so this product reads
+ * as part of the same brand family: Noto Sans JP for Japanese body text,
+ * Inter for English/numerals, the same cream/dark-green/gold palette. See
+ * `assets/intel.css` for the token values.
  */
 import { config } from "../config/index.js";
 import { escapeHtml } from "../lib/text.js";
 import { attr } from "./components.js";
 
 const FONTS_HREF =
-  "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap";
 
 export const SITE_NAME_JA = "日本サッカー・インテリジェンス";
 
@@ -123,7 +125,7 @@ export function renderPage({
     ${metaTag("description", description)}
     ${noindex ? '<meta name="robots" content="noindex, nofollow" />' : ""}
     ${canonical ? `<link rel="canonical" href="${attr(canonical)}" />` : ""}
-    <meta name="theme-color" content="#0f241b" />
+    <meta name="theme-color" content="#0d2b1e" />
     ${metaTag("og:type", "website", { property: true })}
     ${metaTag("og:locale", lang === "ja" ? "ja_JP" : "en_GB", { property: true })}
     ${metaTag("og:site_name", siteName, { property: true })}

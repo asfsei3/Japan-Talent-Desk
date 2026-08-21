@@ -8,9 +8,11 @@
  * this layer standalone (`npm run jfi -- serve`), which is convenient for
  * local development and is not the Railway deployment path.
  */
+import { createReadStream, existsSync, statSync } from "node:fs";
 import { createServer } from "node:http";
+import { extname, join, normalize } from "node:path";
 
-import { config } from "../config/index.js";
+import { config, rootDir } from "../config/index.js";
 import { migrate } from "../db/client.js";
 import { createLogger } from "../lib/logger.js";
 import { getIntelligence } from "./data.js";
@@ -151,9 +153,44 @@ function startScheduler() {
   log.info("scheduler started", { checkIntervalMs: CHECK_INTERVAL_MS });
 }
 
+const STATIC_TYPES = {
+  ".css": "text/css; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".js": "text/javascript; charset=utf-8",
+};
+
+/**
+ * `/assets/*` only — the standalone server is for local JFI development, not
+ * a general static site host. The Railway deployment path is the root
+ * `server.js`, which already serves the whole repo and mounts this module's
+ * `createRequestHandler()` under `config.basePath`; duplicating that here
+ * would be two static-file implementations to keep in sync for no reason.
+ */
+function serveAsset(request, response) {
+  const pathname = (request.url ?? "/").split("?")[0];
+  if (!pathname.startsWith("/assets/")) return false;
+
+  const cleanPath = normalize(decodeURIComponent(pathname)).replace(/^(\.\.[/\\])+/, "");
+  const filePath = join(rootDir, cleanPath);
+  if (!filePath.startsWith(join(rootDir, "assets")) || !existsSync(filePath) || statSync(filePath).isDirectory()) {
+    return false;
+  }
+
+  response.writeHead(200, {
+    "content-type": STATIC_TYPES[extname(filePath)] ?? "application/octet-stream",
+    "cache-control": "public, max-age=3600",
+  });
+  createReadStream(filePath).pipe(response);
+  return true;
+}
+
 export function startServer() {
   const handler = createRequestHandler();
   createServer((request, response) => {
+    if (serveAsset(request, response)) return;
     handler(request, response);
   }).listen(config.port, () => {
     log.info("JFI standalone server listening", { port: config.port, basePath: config.basePath });
