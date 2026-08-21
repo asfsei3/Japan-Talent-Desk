@@ -28,6 +28,14 @@ const LATIN_FOLD = { "ø": "o", "æ": "ae", "œ": "oe", "ß": "ss", "đ": "d", "
  * The NFC recomposition after stripping combining marks is load-bearing: NFD
  * splits katakana dakuten into a separate U+3099 mark, and without recomposing
  * it the punctuation rule below deletes the mark and turns ブ into フ.
+ *
+ * The possessive rule runs before the blanket apostrophe strip. Deleting
+ * "'s" outright used to merge it into the preceding token — "Ito's" became
+ * "itos" — which made `containsAlias`'s word-boundary check reject every
+ * possessive mention of a name, a routine construction in football
+ * headlines ("Mitoma's injury", "Ito's future"). Splitting it into a
+ * separate token first restores the boundary while still folding a name
+ * that genuinely contains an apostrophe (O'Neill, N'Golo) the same as before.
  */
 export function normalize(value) {
   return String(value ?? "")
@@ -37,6 +45,7 @@ export function normalize(value) {
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .normalize("NFC")
+    .replace(/([a-z])['’`´]s\b/g, "$1 s")
     .replace(/[’'`´]/g, "")
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim()

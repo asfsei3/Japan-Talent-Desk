@@ -708,6 +708,32 @@
   border-color: var(--jfi-gold);
 }
 
+/* managerSentiment bands: a tone axis (negative-to-positive), not a signal-
+   strength axis, so this scale runs to the negative red rather than to gold. */
+.band-negative {
+  color: var(--jfi-negative);
+  background: var(--jfi-negative-light);
+  border-color: rgba(192, 57, 43, 0.3);
+}
+
+.band-mixed {
+  color: var(--jfi-green-ink-70);
+  background: rgba(26, 71, 49, 0.07);
+  border-color: var(--jfi-border);
+}
+
+.band-positive {
+  color: var(--jfi-green-820);
+  background: var(--jfi-gold-light);
+  border-color: var(--jfi-gold-border);
+}
+
+.band-very_positive {
+  color: var(--jfi-green-980);
+  background: var(--jfi-gold);
+  border-color: var(--jfi-gold);
+}
+
 .pill-transition {
   gap: 0.5em;
 }

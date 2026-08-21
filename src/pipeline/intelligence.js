@@ -12,8 +12,9 @@ import { CONFIDENCE_BY_KEY, config, confidenceRank } from "../config/index.js";
 import { all, get } from "../db/client.js";
 import { createLogger } from "../lib/logger.js";
 import { monthsUntil, timeInTimezone, todayInTimezone } from "../lib/time.js";
+import { seasonPhase } from "../lib/season.js";
 import { withinWordingRules } from "./changes.js";
-import { computeJapanMarketScore, computeTransferSignal, getMomentum } from "./signals.js";
+import { computeJapanMarketScore, computeManagerSentimentSignal, computeTransferSignal, getMomentum } from "./signals.js";
 
 const log = createLogger("intelligence");
 
@@ -28,6 +29,13 @@ const SECTION_BY_EVENT_TYPE = {
   social: "market",
   commercial: "market",
 };
+
+/**
+ * Manager/player quotes are about a player's standing at his club — closer to
+ * "出場・パフォーマンス" than to the generic Japan-market attention bucket
+ * `media` otherwise falls into. See `docs/strategy/jfi/70-quote-and-season.md`.
+ */
+const QUOTE_SUBTYPE_SECTION = { manager_comment: "performance", player_comment: "performance" };
 
 /** The core note from docs/strategy/positioning.md, verbatim. */
 export const SCREEN_NOTE =
@@ -57,6 +65,9 @@ function sectionFor(row) {
   }
   if (row.change_type === "signal_band") {
     return parseJson(row.after_value, {})?.signal === "japan_market" ? "market" : "transfer";
+  }
+  if (row.event_type === "media" && QUOTE_SUBTYPE_SECTION[row.event_subtype]) {
+    return QUOTE_SUBTYPE_SECTION[row.event_subtype];
   }
   return SECTION_BY_EVENT_TYPE[row.event_type] ?? "transfer";
 }
@@ -132,6 +143,7 @@ export function buildDailyBrief({ asOfDate } = {}) {
     sections,
     trending: trending.slice(0, 8),
     counts,
+    seasonPhase: seasonPhase(date),
     note: SCREEN_NOTE,
     noteJa: SCREEN_NOTE_JA,
   };
@@ -180,6 +192,7 @@ export function buildPlayerDossier(playerIdOrSlug) {
 
   const transferSignal = computeTransferSignal(player.id);
   const japanMarket = computeJapanMarketScore(player.id);
+  const managerSentiment = computeManagerSentimentSignal(player.id);
   const momentum = getMomentum(player.id, "transfer", config.transferSignal.momentumWindowDays);
 
   const clubsLinked = all(
@@ -299,6 +312,24 @@ export function buildPlayerDossier(playerIdOrSlug) {
     contract,
     performance: { events: [...byType("performance"), ...byType("national_team")].map(eventRow) },
     media: { events: [...byType("media"), ...byType("social"), ...byType("commercial")].map(eventRow) },
+    // Manager & Player Quote Intelligence (`70-quote-and-season.md`): a
+    // dedicated slice of `media` events, not a new event type, so it stays
+    // reachable from `media.events` too and nothing double-counts.
+    quotes: {
+      sentiment:
+        managerSentiment.score === null
+          ? null
+          : {
+              score: managerSentiment.score,
+              band: managerSentiment.band,
+              sampleSize: managerSentiment.inputs.sampleCount,
+              windowDays: managerSentiment.inputs.windowDays,
+              timeline: managerSentiment.timeline,
+            },
+      events: byType("media")
+        .filter((row) => row.subtype === "manager_comment" || row.subtype === "player_comment")
+        .map(eventRow),
+    },
     japanMarket: {
       score: japanMarket.score,
       band: japanMarket.band,

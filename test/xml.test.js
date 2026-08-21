@@ -15,7 +15,7 @@ test("parses an RSS 2.0 feed with CDATA and namespaced fields", () => {
 
   assert.equal(feed.format, "rss");
   assert.equal(feed.feedTitle, "The Guardian — Football");
-  assert.equal(feed.items.length, 4);
+  assert.equal(feed.items.length, 5);
 
   const [first] = feed.items;
   assert.equal(first.title, "Liverpool weigh January move for Bayern Munich defender Hiroki Ito");

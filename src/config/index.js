@@ -174,15 +174,23 @@ export const config = {
   /**
    * Transfer Signal weights. Deliberately transparent and additive: the product
    * promises no fake precision, so every point must be explainable in the UI.
+   *
+   * `indirectSignal` is the smallest weight on purpose: a squad omission or a
+   * hedging manager quote is real evidence but weaker than an explicit transfer
+   * report, so it must never be able to outweigh `reportVolume` or
+   * `sourceQuality` on its own. See `docs/strategy/jfi/70-quote-and-season.md`.
+   * `reportVolume` and `sourceQuality` were both trimmed by 3 to make room for
+   * it — the total stays 100.
    */
   transferSignal: {
     weights: {
-      reportVolume: 26,
-      sourceQuality: 22,
+      reportVolume: 23,
+      sourceQuality: 19,
       clubsLinked: 16,
       contractPressure: 16,
       playerSideSignal: 10,
       clubSituation: 10,
+      indirectSignal: 6,
     },
     halfLifeDays: 6,
     windowDays: 21,
@@ -193,6 +201,32 @@ export const config = {
       { key: "very_high", label: "VERY HIGH", min: 75 },
     ],
     momentumWindowDays: 7,
+  },
+
+  /**
+   * Manager & Player Quote Intelligence (`70-quote-and-season.md`). A separate
+   * signal, not a Transfer Signal input, because sentiment about a player's
+   * standing at a club is a different question from "how likely is a move" —
+   * conflating them would make neither number mean one thing. Only
+   * `media`/`manager_comment` and `media`/`player_comment` events with an
+   * extracted `sentiment` or `selection_signal` fact feed this; a player with
+   * no quote coverage in the window gets no row at all, never a fabricated
+   * neutral default.
+   */
+  managerSentiment: {
+    // Opinion drifts slower than a transfer rumour cycle, so both the decay
+    // and the window are longer than transferSignal's.
+    halfLifeDays: 14,
+    windowDays: 45,
+    // Raw signed, decayed, tier-weighted sum at which the scale saturates to
+    // 0 (very negative) or 100 (very positive); 50 is neutral.
+    saturation: 3,
+    bands: [
+      { key: "negative", label: "NEGATIVE", min: 0 },
+      { key: "mixed", label: "MIXED", min: 35 },
+      { key: "positive", label: "POSITIVE", min: 60 },
+      { key: "very_positive", label: "VERY POSITIVE", min: 80 },
+    ],
   },
 
   /**

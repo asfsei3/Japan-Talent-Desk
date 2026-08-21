@@ -37,11 +37,81 @@ const EVENT_RULES = [
   { type: "national_team", subtype: "call_up", keywords: ["japan squad", "samurai blue", "national team", "call-up", "world cup qualifier", "日本代表"] },
   { type: "commercial", subtype: "sponsorship", keywords: ["sponsor", "endorsement", "brand ambassador", "commercial deal", "スポンサー"] },
   { type: "club_situation", subtype: "manager", keywords: ["sacked", "new head coach", "new manager", "relegation", "監督"] },
+  {
+    type: "media",
+    subtype: "manager_comment",
+    keywords: ["said the manager", "manager said", "head coach said", "press conference", "told reporters after the match", "監督は語った", "監督が語った"],
+  },
+  {
+    type: "media",
+    subtype: "player_comment",
+    keywords: ["the player said", "he told reporters", "told the press", "said in an interview about his future", "選手は語った", "本人は語った"],
+  },
   { type: "media", subtype: "feature", keywords: ["interview", "documentary", "column", "インタビュー"] },
 ];
 
 const STRONG_CLAIM_WORDS = ["official", "confirmed", "announced", "completed", "signed", "medical", "agreement", "公式"];
 const WEAK_CLAIM_WORDS = ["rumour", "rumor", "linked", "monitoring", "monitor", "could", "reportedly", "speculation", "eyeing", "噂"];
+
+const QUOTE_SUBTYPES = new Set(["manager_comment", "player_comment"]);
+
+/**
+ * Keyword doubles for the quote-derived signals `classify.js` now asks a real
+ * model for. Negative phrasing is checked first because it is usually the
+ * more specific tell ("not guaranteed a starting" vs. the bare word "start").
+ */
+const NEGATIVE_SENTIMENT_WORDS = ["not good enough", "disappointed", "needs to improve", "struggling", "concerned", "not entirely happy", "懸念", "物足りない"];
+const POSITIVE_SENTIMENT_WORDS = ["excellent", "impressed", "deserves", "key player", "very pleased", "happy with his", "素晴らしい", "高く評価"];
+const NEGATIVE_SELECTION_WORDS = ["not guaranteed a starting", "out of the squad", "left out", "benched", "no guarantees over his role", "起用は保証されない", "メンバー外"];
+const POSITIVE_SELECTION_WORDS = ["nailed on starter", "guaranteed starter", "first-choice", "will start", "in my starting eleven", "レギュラーに定着"];
+const INDIRECT_TRANSFER_WORDS = ["future is uncertain", "assess his options", "listening to offers", "not guaranteed to stay", "future away from the club", "could leave in the", "契約継続の保証はない", "移籍の可能性を排除しない"];
+
+function firstHit(article, wordLists) {
+  for (const [label, words] of wordLists) {
+    const hit = words.find((word) => hasKeyword(article, word));
+    if (hit) return { label, hit };
+  }
+  return null;
+}
+
+/**
+ * The extra facts `classify.js`'s QUOTE_RULES asks a real model for, derived
+ * the same deterministic way as everything else in this file. Only produced
+ * for the two quote subtypes — a transfer/injury/contract article never gets
+ * these fields, matching what the real prompt actually asks for.
+ */
+function quoteFacts(article, rule) {
+  if (!QUOTE_SUBTYPES.has(rule.subtype)) return [];
+
+  const facts = [];
+  const speaker = rule.subtype === "manager_comment" ? "manager" : "player";
+  facts.push({ field: "speaker", value: speaker, supporting_sentence: supportingSentence(article, rule.matched) });
+
+  const sentiment = firstHit(article, [
+    ["negative", NEGATIVE_SENTIMENT_WORDS],
+    ["positive", POSITIVE_SENTIMENT_WORDS],
+  ]);
+  facts.push({
+    field: "sentiment",
+    value: sentiment?.label ?? "neutral",
+    supporting_sentence: sentiment ? supportingSentence(article, sentiment.hit) : supportingSentence(article, rule.matched),
+  });
+
+  const selection = firstHit(article, [
+    ["negative", NEGATIVE_SELECTION_WORDS],
+    ["positive", POSITIVE_SELECTION_WORDS],
+  ]);
+  if (selection) {
+    facts.push({ field: "selection_signal", value: selection.label, supporting_sentence: supportingSentence(article, selection.hit) });
+  }
+
+  const indirect = INDIRECT_TRANSFER_WORDS.find((word) => hasKeyword(article, word));
+  if (indirect) {
+    facts.push({ field: "transfer_signal_indirect", value: "positive", supporting_sentence: supportingSentence(article, indirect) });
+  }
+
+  return facts;
+}
 
 function extractTag(prompt, tag) {
   const match = new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`).exec(prompt);
@@ -130,6 +200,8 @@ const JA_TEMPLATES = {
   "national_team:call_up": ({ player }) => `${player}の代表関連の動きが報じられている`,
   "commercial:sponsorship": ({ player }) => `${player}のスポンサー関連の動きが報じられている`,
   "club_situation:manager": ({ club }) => `${club ?? "クラブ"}の監督人事が報じられている`,
+  "media:manager_comment": ({ player }) => `${player}について監督がコメントしたと報じられている`,
+  "media:player_comment": ({ player }) => `${player}が自身について語ったと報じられている`,
   "media:feature": ({ player }) => `${player}に関する記事が公開された`,
 };
 
@@ -145,6 +217,11 @@ function importanceFor(article, rule, players, clubs) {
   if (clubs.length >= 2) importance += 1;
   if (STRONG_CLAIM_WORDS.some((word) => hasKeyword(article, word))) importance += 1;
   if (rule.type === "media") importance -= 1;
+  // A quote hinting at a move without an explicit transfer report is exactly
+  // the case QUOTE_RULES exists for — worth surfacing, not filed as background.
+  if (QUOTE_SUBTYPES.has(rule.subtype) && INDIRECT_TRANSFER_WORDS.some((word) => hasKeyword(article, word))) {
+    importance += 1;
+  }
   return Math.max(1, Math.min(5, importance));
 }
 
@@ -219,6 +296,7 @@ function extractResponse(article, { upgradeConfidence = false } = {}) {
     value: `${rule.type}:${rule.subtype}`,
     supporting_sentence: supportingSentence(article, rule.matched),
   });
+  facts.push(...quoteFacts(article, rule));
 
   const base = selfConfidence(article);
   const upgraded = upgradeConfidence && base === "low" ? "medium" : base;

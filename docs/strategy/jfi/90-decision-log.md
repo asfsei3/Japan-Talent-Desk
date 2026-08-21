@@ -87,3 +87,28 @@ structuring → intelligence → decision-support engine. None of them get a tab
 and none of their sources are seeded. They are parked in `80-product-ideas.md` precisely so a
 future session does not accidentally fold their schema needs into JFI's — see that document for
 why the boundary is there.
+
+### D9 — Quote Intelligence is a new signal, not a Transfer Signal rewrite; the content calendar gets two phases, not six
+
+Manager/player quote sentiment and an indirect transfer signal (a hedging quote, a squad omission)
+were added per the founder's request. Sentiment became its own `signal_type = 'manager_sentiment'`
+rather than a Transfer Signal input, because "what is the tone around this player" and "how likely
+is a move" are different questions — see `70-quote-and-season.md` for why conflating them would
+make neither number mean one thing. The indirect signal did go into Transfer Signal, as the
+smallest of its six weights (6 of 100, trimmed from `reportVolume` and `sourceQuality`) specifically
+so it cannot move a band the way an explicit report can.
+
+The founder's six-phase football calendar (in-season, post-season, transfer window, pre-season,
+pre-kickoff, season-start) was narrowed to two (`transfer_window`, `in_season`) in
+`src/lib/season.js`. Exact pre-season and transfer-window dates are set per league, per year, and
+shift — asserting a precise sub-phase from a bare date would be the same unsupported-precision
+mistake `docs/strategy/positioning.md` rules out for transfer probabilities and fees. Two
+mutually-exclusive, date-only phases cover the full year with no gap and are each defensible; six
+would not be. This changes daily-brief section order only — fetch cadence stays exactly as D5 and
+`60-automation-plan.md` set it.
+
+While building the test fixture for this feature, a genuine pre-existing bug was found and fixed:
+`normalize()` (`src/lib/text.js`) deleted apostrophes outright, so "Ito's future" normalised to
+"itos future", destroying the word boundary `containsAlias()` needs and silently failing to
+resolve *every* possessive mention of a tracked player's name. See `70-quote-and-season.md` §3 for
+the fix and `85-risks.md`'s "Entity misattribution" for the risk class this belongs to.

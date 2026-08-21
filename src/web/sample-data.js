@@ -11,17 +11,20 @@
  * The fixtures deliberately include hostile third-party strings (a source name
  * with markup in it) so the escaping tests have something real to catch.
  */
+import { seasonPhase } from "../lib/season.js";
 import { todayInTimezone } from "../lib/time.js";
 
 export function emptyIntelligence() {
   return {
     buildDailyBrief({ asOfDate } = {}) {
+      const date = asOfDate || todayInTimezone();
       return {
-        asOfDate: asOfDate || todayInTimezone(),
+        asOfDate: date,
         updatedAt: null,
         sections: { transfer: [], injury: [], contract: [], performance: [], market: [] },
         trending: [],
         counts: { changes: 0, players: 0, sources: 0, articles: 0 },
+        seasonPhase: seasonPhase(date),
       };
     },
     buildPlayerDossier() {
@@ -102,6 +105,7 @@ export function sampleDailyBrief({ asOfDate } = {}) {
     asOfDate: date,
     updatedAt: "2026-08-20T08:32:00Z",
     counts: { changes: 5, players: 31, sources: 8, articles: 214 },
+    seasonPhase: seasonPhase(date),
     sections: {
       transfer: [
         change({

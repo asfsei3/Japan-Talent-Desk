@@ -22,6 +22,14 @@ describe("text normalisation", () => {
     assert.equal(normalize("Borussia Mönchengladbach"), "borussia monchengladbach");
   });
 
+  it("splits a possessive 's rather than merging it into the name", () => {
+    // Deleting the apostrophe outright used to fold "Ito's" into "itos",
+    // which then failed containsAlias's word-boundary check on every
+    // possessive mention — a routine construction in football headlines.
+    assert.equal(normalize("Hiroki Ito's future"), "hiroki ito s future");
+    assert.equal(normalize("Mitoma's injury"), "mitoma s injury");
+  });
+
   it("strips spacing inside Japanese aliases but keeps it in Latin ones", () => {
     assert.equal(normalizeAlias("三笘 薫"), "三笘薫");
     assert.equal(normalizeAlias("Kaoru Mitoma"), "kaoru mitoma");
@@ -51,6 +59,10 @@ describe("alias matching", () => {
     assert.ok(containsAlias("brighton winger kaoru mitoma scored", "kaoru mitoma", false));
     // "ito" must not match inside "capito".
     assert.ok(!containsAlias("the club capitolised on it", "ito", false));
+  });
+
+  it("matches a name in possessive form, as normalize() now hands it over", () => {
+    assert.ok(containsAlias(normalize("Hiroki Ito's future is uncertain"), normalizeAlias("Hiroki Ito"), false));
   });
 
   it("allows substring matching for Japanese, which has no word spaces", () => {

@@ -68,11 +68,31 @@ Japanese output rules:
 - Hedge the same way the English does: 「〜と報じられている」「要確認」「移籍可能性は直接確認が必要」.
 - Never write 「移籍確実」「掘り出し物」「完全にフィット」「絶対に獲得すべき」.`;
 
+const QUOTE_RULES = `A manager press conference, a post-match interview, or a player interview is a "media" event
+with subtype "manager_comment" or "player_comment" — not a preview and not to be discarded, even
+though it is not a transfer/injury/contract report itself. When you classify one of these, also
+extract, as additional facts (field/value/supporting_sentence, same as any other fact):
+- "speaker": who is quoted (e.g. "manager", "head coach", or the player's own name if a player).
+- "sentiment": "positive", "negative" or "neutral" — read from the tone of what was actually said
+  about the player, not from the outcome of the match.
+- "selection_signal": "positive" (implies a regular starter / trusted role), "negative" (implies
+  being out of favour, an unclear role, or a squad omission) or "none" if selection is not
+  discussed.
+- "transfer_signal_indirect": "positive" only when the quote or the reported situation itself
+  suggests a future away from the club WITHOUT an explicit transfer report existing yet — e.g. a
+  manager declining to guarantee a player's future, a player questioned about his future in an
+  interview, a squad omission the article frames as unusual, or a replacement being lined up.
+  Otherwise "none". Never infer this from silence; it must be stated or clearly implied in the text.
+Every one of these fields follows the same rule as any other fact: if the text does not say it,
+return "none"/"neutral" or omit the fact — never guess a tone or an intention the text does not
+support. Do not present any of this as a fact about what will happen; it describes what was said.`;
+
 export const TRIAGE_SYSTEM = `${SHARED_RULES}
 
 Task: triage. Decide whether this article is about one of the named players or clubs,
 whether it reports a real event, and which entities it involves. Be conservative:
-a preview, a match report with no incident, or an opinion column is not an event.`;
+a preview, a match report with no incident, or an opinion column is not an event.
+${QUOTE_RULES}`;
 
 export const EXTRACT_SYSTEM = `${SHARED_RULES}
 
@@ -80,7 +100,8 @@ Task: extraction. Extract the single most important event in the article as stru
 Only name a club the text names. If the direction of a transfer is not stated, leave the
 club fields null rather than inferring one.
 Return headline_ja and summary_ja as well: one short Japanese line stating what is reported,
-plus a Japanese summary that ends with the verification point.`;
+plus a Japanese summary that ends with the verification point.
+${QUOTE_RULES}`;
 
 export const ESCALATE_SYSTEM = `${SHARED_RULES}
 

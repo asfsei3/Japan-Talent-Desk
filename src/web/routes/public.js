@@ -7,6 +7,7 @@
  * who is this player, how reliable is this, and what should be verified next.
  */
 import { config } from "../../config/index.js";
+import { seasonPhase, SEASON_PHASES } from "../../lib/season.js";
 import { escapeHtml } from "../../lib/text.js";
 import { shiftDate, todayInTimezone } from "../../lib/time.js";
 import {
@@ -47,9 +48,23 @@ const SECTIONS = [
   { key: "transfer", icon: "🔄", label: "移籍", blurb: "移籍シグナルの変動、新たな関心クラブ、報じられた打診。" },
   { key: "injury", icon: "🏥", label: "怪我", blurb: "出場可否の変化。起用可否は直接確認が必要です。" },
   { key: "contract", icon: "📄", label: "契約", blurb: "契約に関する状況。契約内容は直接確認が必要です。" },
-  { key: "performance", icon: "⚽", label: "出場", blurb: "直近の一軍での出場リズム（報道ベース）。" },
+  { key: "performance", icon: "⚽", label: "出場・コメント", blurb: "直近の一軍での出場リズムと監督・選手コメント（報道ベース）。" },
   { key: "market", icon: "🇯🇵", label: "日本市場", blurb: "日本メディア・検索・SNSでの動き。" },
 ];
+
+/**
+ * `70-quote-and-season.md`: the dashboard's section order rotates with the
+ * football calendar so the page has a reason to open outside a transfer
+ * window, rather than going quiet the moment one closes.
+ */
+function sectionsForPhase(phase) {
+  const order =
+    phase?.key === SEASON_PHASES.TRANSFER_WINDOW.key
+      ? ["transfer", "contract", "performance", "injury", "market"]
+      : ["performance", "injury", "market", "transfer", "contract"];
+  const byKey = new Map(SECTIONS.map((section) => [section.key, section]));
+  return order.map((key) => byKey.get(key));
+}
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -140,6 +155,8 @@ function renderDailyBrief(ctx) {
   const counts = pick(brief, "counts") || {};
   const updatedAt = pick(brief, "updatedAt", "updated_at");
   const trending = Array.isArray(pick(brief, "trending")) ? brief.trending : [];
+  const phase = pick(brief, "seasonPhase") ?? seasonPhase(asOfDate);
+  const orderedSections = sectionsForPhase(phase);
   const changes = allChanges(brief);
   const headline = changes
     .map(normalizeChange)
@@ -164,7 +181,9 @@ function renderDailyBrief(ctx) {
   const terminalBar =
     `<div class="terminal-bar">
       <p class="terminal-title"><span aria-hidden="true">🇯🇵</span> JAPAN FOOTBALL INTELLIGENCE — TODAY</p>
-      <p class="terminal-stamp">${timeTag(`${asOfDate}T00:00:00Z`)}${
+      <p class="terminal-stamp">
+        <span class="chip chip-reported chip-compact">${phase.key === "transfer_window" ? "🔥" : "⚽"} ${escapeHtml(phase.labelJa)}</span>
+        ${timeTag(`${asOfDate}T00:00:00Z`)}${
         updatedAt ? ` ・ 最終更新 ${escapeHtml(jstDateTime(updatedAt))}` : " ・ この日のパイプライン実行記録はありません"
       }</p>
     </div>`;
@@ -191,7 +210,7 @@ function renderDailyBrief(ctx) {
       }
     </section>`;
 
-  const sectionsHtml = SECTIONS.map((section) => {
+  const sectionsHtml = orderedSections.map((section) => {
     const rows = sectionRows(brief, section.key);
     return (
       `<section class="brief-section brief-row" id="${attr(section.key)}" aria-labelledby="${attr(`${section.key}-heading`)}">
@@ -237,7 +256,7 @@ function renderDailyBrief(ctx) {
       });
 
   const yesterdayBlock = (() => {
-    const rows = SECTIONS.map((section) => {
+    const rows = orderedSections.map((section) => {
       const now = sectionRows(brief, section.key).length;
       const before = sectionRows(previousBrief, section.key).length;
       const delta = now - before;
@@ -594,6 +613,8 @@ function renderPlayerPage(ctx) {
   const japan = pick(dossier, "japanMarket", "japan_market") || {};
   const contract = pick(dossier, "contract") || {};
   const injury = pick(dossier, "injury") || {};
+  const quotes = pick(dossier, "quotes") || {};
+  const sentiment = quotes.sentiment ?? null;
 
   // Without the pipeline module the DB is still the honest source for events.
   const fallbackEvents = dossier ? [] : listPlayerEvents(row?.id ?? 0);
@@ -739,6 +760,25 @@ function renderPlayerPage(ctx) {
         ${eventList(pick(dossier, "performance")?.events ?? fallbackEvents.filter((event) => event.type === "performance"), {
           emptyText: "出場に関する記録はまだありません。",
         })}
+      </section>
+
+      <section aria-labelledby="quotes-heading" class="panel">
+        <h2 id="quotes-heading"><span aria-hidden="true">🎙️</span> 監督・選手コメント</h2>
+        ${
+          sentiment
+            ? scoreMeter({
+                label: "コメントの論調",
+                score: sentiment.score,
+                band: sentiment.band,
+                coverage: 1,
+                inputs: { sampleSize: sentiment.sampleSize, windowDays: sentiment.windowDays },
+                note:
+                  `直近${sentiment.windowDays}日間の監督・選手コメント${sentiment.sampleSize}件の論調から算出しています。` +
+                  "移籍・起用に関する意図を断定するものではなく、発言内容から読み取れる傾向です。",
+              })
+            : `<p class="panel-lead">この選手についての監督・選手コメントはまだ記録されていません。</p>`
+        }
+        ${eventList(quotes.events, { emptyText: "監督・選手コメントの記録はまだありません。" })}
       </section>
 
       <section aria-labelledby="injury-heading" class="panel">

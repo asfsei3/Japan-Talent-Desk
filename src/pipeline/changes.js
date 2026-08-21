@@ -74,6 +74,8 @@ const SUBTYPE_LABELS_JA = {
   return: "復帰情報",
   goal: "出場・得点情報",
   call_up: "代表関連情報",
+  manager_comment: "監督コメント",
+  player_comment: "選手コメント",
 };
 
 const TYPE_LABELS_JA = {

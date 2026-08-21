@@ -55,6 +55,13 @@ const BAND_LABELS = {
   moderate: "中程度",
   high: "高",
   very_high: "非常に高い",
+  // managerSentiment bands (config.managerSentiment.bands) — a different axis
+  // (negative-to-positive tone), not a signal-strength scale, so they get
+  // their own labels rather than being folded into low/medium/high.
+  negative: "否定的",
+  mixed: "賛否混在",
+  positive: "肯定的",
+  very_positive: "非常に肯定的",
 };
 
 const TIER_LABELS = {

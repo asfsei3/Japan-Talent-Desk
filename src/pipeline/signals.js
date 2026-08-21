@@ -24,6 +24,12 @@ const REPORT_VOLUME_SATURATION = 5;
 const CLUBS_LINKED_SATURATION = 3;
 const PLAYER_SIDE_SATURATION = 2;
 const CLUB_SITUATION_SATURATION = 2;
+// Lower than REPORT_VOLUME_SATURATION: indirect evidence (a hedging quote, a
+// squad omission) is rarer and less certain than an explicit transfer report,
+// so each occurrence should move the component further — but the component's
+// own weight (config.transferSignal.weights.indirectSignal = 6, the smallest
+// of the six) is what actually keeps it from outweighing explicit reports.
+const INDIRECT_SIGNAL_SATURATION = 2;
 
 /** Personal terms and negotiation stages are the player-side tell we can measure. */
 const PLAYER_SIDE_SUBTYPES = new Set(["agreement", "talks"]);
@@ -82,6 +88,25 @@ function component(raw, normalized, weight) {
   };
 }
 
+/** `events.payload` is a JSON blob written by `persist.js`; never trust it blindly. */
+function payloadFacts(payloadJson) {
+  try {
+    const payload = payloadJson ? JSON.parse(payloadJson) : null;
+    return Array.isArray(payload?.facts) ? payload.facts : [];
+  } catch {
+    return [];
+  }
+}
+
+function factValue(facts, field) {
+  const fact = facts.find((entry) => entry?.field === field);
+  return fact ? String(fact.value ?? "").toLowerCase() : null;
+}
+
+function ageDays(publishedAt, now) {
+  return Math.max(0, (now.getTime() - new Date(publishedAt).getTime()) / 86_400_000);
+}
+
 // ---------------------------------------------------------------------------
 // Transfer signal
 // ---------------------------------------------------------------------------
@@ -104,8 +129,25 @@ export function computeTransferSignal(playerId, { asOf } = {}) {
   const decayed = transferRows.map((row) => ({
     ...row,
     // Exponential decay: a report from three weeks ago is not news today.
-    decay: decayFactor(Math.max(0, (now.getTime() - new Date(row.at).getTime()) / 86_400_000), config.transferSignal.halfLifeDays),
+    decay: decayFactor(ageDays(row.at, now), config.transferSignal.halfLifeDays),
   }));
+
+  // Indirect signal (70-quote-and-season.md): a manager/player quote or squad
+  // situation that implies a possible move without an explicit transfer report
+  // existing yet. Only facts a classifier actually extracted count — this never
+  // infers intent from the absence of a report.
+  const quoteRows = all(
+    `SELECT e.payload, es.tier, COALESCE(es.published_at, es.detected_at) AS at
+       FROM events e JOIN event_sources es ON es.event_id = e.id
+      WHERE e.player_id = ? AND e.status = 'active' AND e.type = 'media'
+        AND e.subtype IN ('manager_comment', 'player_comment')
+        AND COALESCE(es.published_at, es.detected_at) >= ?`,
+    playerId, since
+  );
+  const indirectSignalRaw = quoteRows.reduce((sum, row) => {
+    if (factValue(payloadFacts(row.payload), "transfer_signal_indirect") !== "positive") return sum;
+    return sum + decayFactor(ageDays(row.at, now), config.transferSignal.halfLifeDays) * (SOURCE_TIERS[row.tier]?.weight ?? 0.25);
+  }, 0);
 
   const volume = decayed.reduce((sum, row) => sum + row.decay, 0);
   const qualityWeight = decayed.reduce((sum, row) => sum + row.decay * (SOURCE_TIERS[row.tier]?.weight ?? 0.25), 0);
@@ -127,7 +169,7 @@ export function computeTransferSignal(playerId, { asOf } = {}) {
       player.current_club_id, player.current_club_id, since
     );
     clubSituationRaw = clubRows.reduce(
-      (sum, row) => sum + decayFactor(Math.max(0, (now.getTime() - new Date(row.at).getTime()) / 86_400_000), config.transferSignal.halfLifeDays),
+      (sum, row) => sum + decayFactor(ageDays(row.at, now), config.transferSignal.halfLifeDays),
       0
     );
   }
@@ -157,9 +199,74 @@ export function computeTransferSignal(playerId, { asOf } = {}) {
       clamp01((clubSituationRaw ?? 0) / CLUB_SITUATION_SATURATION),
       weights.clubSituation
     ),
+    indirectSignal: component(
+      round(indirectSignalRaw, 2),
+      clamp01(indirectSignalRaw / INDIRECT_SIGNAL_SATURATION),
+      weights.indirectSignal
+    ),
   };
 
   return assemble(inputs, config.transferSignal.bands);
+}
+
+// ---------------------------------------------------------------------------
+// Manager & Player Quote Intelligence (`70-quote-and-season.md`)
+// ---------------------------------------------------------------------------
+
+/**
+ * A separate signal from Transfer Signal: sentiment about a player's standing
+ * at his club is a different question from "how likely is a move", and a
+ * quote can carry one without the other (a manager can be full of praise for
+ * a player he is simultaneously about to sell). Returns `score: null` when
+ * there is no quote coverage in the window — never a fabricated neutral 50.
+ */
+export function computeManagerSentimentSignal(playerId, { asOf } = {}) {
+  const cfg = config.managerSentiment;
+  const now = asOf ? new Date(asOf) : new Date();
+  const since = isoDaysAgo(cfg.windowDays, now);
+
+  const rows = all(
+    `SELECT e.payload, es.tier, COALESCE(es.published_at, es.detected_at) AS at
+       FROM events e JOIN event_sources es ON es.event_id = e.id
+      WHERE e.player_id = ? AND e.status = 'active' AND e.type = 'media'
+        AND e.subtype IN ('manager_comment', 'player_comment')
+        AND COALESCE(es.published_at, es.detected_at) >= ?
+      ORDER BY at ASC`,
+    playerId, since
+  );
+
+  const SENTIMENT_VALUE = { positive: 1, neutral: 0, negative: -1 };
+  const SELECTION_VALUE = { positive: 0.5, neutral: 0, negative: -0.5 };
+
+  let weightedSum = 0;
+  let sampleCount = 0;
+  const timeline = [];
+
+  for (const row of rows) {
+    const facts = payloadFacts(row.payload);
+    const sentiment = factValue(facts, "sentiment");
+    const selection = factValue(facts, "selection_signal");
+    if (sentiment === null && selection === null) continue;
+
+    const decay = decayFactor(ageDays(row.at, now), cfg.halfLifeDays);
+    const tierWeight = SOURCE_TIERS[row.tier]?.weight ?? 0.25;
+    weightedSum += ((SENTIMENT_VALUE[sentiment] ?? 0) + (SELECTION_VALUE[selection] ?? 0)) * decay * tierWeight;
+    sampleCount += 1;
+    timeline.push({ at: row.at, sentiment: sentiment ?? "neutral", selectionSignal: selection ?? "none" });
+  }
+
+  if (sampleCount === 0) {
+    return { score: null, band: null, coverage: 0, inputs: { sampleCount: 0, windowDays: cfg.windowDays }, timeline: [] };
+  }
+
+  const score = round(clamp01(weightedSum / cfg.saturation / 2 + 0.5) * 100);
+  return {
+    score,
+    band: bandFor(cfg.bands, score).label,
+    coverage: 1,
+    inputs: { sampleCount, windowDays: cfg.windowDays },
+    timeline: timeline.slice(-10),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -252,16 +359,26 @@ export function recomputeSignals({ playerIds, asOfDate } = {}) {
 
   let transferUpdated = 0;
   let japanMarketUpdated = 0;
+  let managerSentimentUpdated = 0;
 
   for (const id of ids) {
     writeSignal({ entityId: id, signalType: "transfer", result: computeTransferSignal(id, { asOf: date }), asOfDate: date });
     transferUpdated += 1;
     writeSignal({ entityId: id, signalType: "japan_market", result: computeJapanMarketScore(id, { asOf: date }), asOfDate: date });
     japanMarketUpdated += 1;
+
+    // No row at all when there is no quote coverage — `signals`/`signal_history`
+    // both have NOT NULL score/band, and a fabricated neutral default would be
+    // exactly the kind of guessed input rule 1 at the top of this file forbids.
+    const managerSentiment = computeManagerSentimentSignal(id, { asOf: date });
+    if (managerSentiment.score !== null) {
+      writeSignal({ entityId: id, signalType: "manager_sentiment", result: managerSentiment, asOfDate: date });
+      managerSentimentUpdated += 1;
+    }
   }
 
   log.info("signals recomputed", { players: ids.length, asOfDate: date });
-  return { players: ids.length, transferUpdated, japanMarketUpdated };
+  return { players: ids.length, transferUpdated, japanMarketUpdated, managerSentimentUpdated };
 }
 
 /**
