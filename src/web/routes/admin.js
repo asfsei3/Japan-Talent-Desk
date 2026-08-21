@@ -11,10 +11,10 @@
  * (`10-architecture.md` "Backup: external trigger") for when the in-process
  * tick is suspected wedged or a run needs to be forced by hand.
  */
-import { timingSafeEqual } from "node:crypto";
 import { all, get } from "../../db/client.js";
 import { config } from "../../config/index.js";
 import { withJobRun } from "../../jobs/run-tracking.js";
+import { checkBasicAuth } from "../../lib/basic-auth.js";
 import { createLogger } from "../../lib/logger.js";
 import { todayInTimezone } from "../../lib/time.js";
 
@@ -53,31 +53,8 @@ ${body}
 </html>`;
 }
 
-function safeEqual(a, b) {
-  const bufA = Buffer.from(String(a));
-  const bufB = Buffer.from(String(b));
-  if (bufA.length !== bufB.length) {
-    // Compare against a same-length dummy so the mismatch doesn't leak length via timing.
-    timingSafeEqual(bufA, Buffer.alloc(bufA.length));
-    return false;
-  }
-  return timingSafeEqual(bufA, bufB);
-}
-
 function requireAuth(ctx) {
-  const header = String(ctx.request.headers.authorization ?? "");
-  const [scheme, encoded] = header.split(" ");
-  if (scheme !== "Basic" || !encoded) return false;
-  let decoded = "";
-  try {
-    decoded = Buffer.from(encoded, "base64").toString("utf8");
-  } catch {
-    return false;
-  }
-  const separator = decoded.indexOf(":");
-  const user = separator === -1 ? decoded : decoded.slice(0, separator);
-  const pass = separator === -1 ? "" : decoded.slice(separator + 1);
-  return safeEqual(user, config.admin.user) && safeEqual(pass, config.admin.password);
+  return checkBasicAuth(ctx.request.headers.authorization, config.admin.user, config.admin.password);
 }
 
 function unauthorized() {
