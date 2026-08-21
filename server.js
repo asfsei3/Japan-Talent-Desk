@@ -33,6 +33,39 @@ if (existsSync(envPath)) {
   }
 }
 
+const { config } = await import("./src/config/index.js");
+
+/**
+ * The Japan Football Intelligence product is mounted under `config.basePath`
+ * (default `/intel`) so the deployed Japan Talent Desk landing page at `/` is
+ * untouched. Loading it lazily keeps the static site serving even if the
+ * intelligence layer fails to start.
+ */
+let intelHandler = null;
+let intelHandlerFailedAt = 0;
+// A startup failure is retried after a cooldown instead of being cached
+// forever — a transient issue (e.g. a briefly locked SQLite file) at the
+// very first request must not disable /intel for the rest of the process.
+const INTEL_RETRY_COOLDOWN_MS = 30_000;
+
+async function getIntelHandler() {
+  if (intelHandler) return intelHandler;
+  if (intelHandler === false && Date.now() - intelHandlerFailedAt < INTEL_RETRY_COOLDOWN_MS) {
+    return false;
+  }
+
+  try {
+    const { createRequestHandler } = await import("./src/web/server.js");
+    intelHandler = createRequestHandler();
+  } catch (error) {
+    console.error("Japan Football Intelligence routes unavailable:", error?.message || error);
+    intelHandler = false;
+    intelHandlerFailedAt = Date.now();
+  }
+
+  return intelHandler;
+}
+
 const port = Number(process.env.PORT || 3000);
 const brevoApiKey = process.env.BREVO_API_KEY;
 const brevoNewsletterListId = Number(process.env.BREVO_LIST_ID_JAPAN_MARKET_WEEKLY || 0);
@@ -244,6 +277,28 @@ async function handleNewsletterSignup(request, response) {
 }
 
 createServer((request, response) => {
+  const path = (request.url || "/").split("?")[0];
+
+  if (path === config.basePath || path.startsWith(`${config.basePath}/`)) {
+    getIntelHandler()
+      .then((handler) => {
+        if (!handler) {
+          response.writeHead(503, { "content-type": "text/plain; charset=utf-8" });
+          response.end("Japan Football Intelligence is not available.");
+          return;
+        }
+        handler(request, response);
+      })
+      .catch((error) => {
+        console.error("Intelligence route failed:", error);
+        if (!response.headersSent) {
+          response.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
+        }
+        response.end("Internal error");
+      });
+    return;
+  }
+
   if (request.method === "POST" && request.url === "/api/newsletter") {
     handleNewsletterSignup(request, response).catch((error) => {
       console.error("Newsletter signup failed unexpectedly:", error);
@@ -269,5 +324,5 @@ createServer((request, response) => {
   });
   createReadStream(filePath).pipe(response);
 }).listen(port, () => {
-  console.log(`Japan Talent Desk static site running on port ${port}`);
+  console.log(`Japan Talent Desk site on port ${port} · intelligence mounted at ${config.basePath}`);
 });

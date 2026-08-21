@@ -1,0 +1,31 @@
+{
+  "_comment": "Monetization slots for the free layer. Everything here is OFF by default: with this file empty (or absent) the product renders no advertising, no affiliate blocks and no streaming links at all, and must remain fully useful in that state. Add entries only when a real partnership exists. Every rendered block carries a visible 広告 / PR label, sits below the intelligence content, and is never placed between a claim and its sources.",
+  "enabled": false,
+  "disclosure": "アフィリエイトリンクを含みます。リンク経由の購入により当サイトが手数料を得る場合があります。",
+  "ads": {
+    "_shape": "position -> { label, html } — html is inserted verbatim, so only ever paste markup from a partner you control.",
+    "dashboard-leaderboard": null,
+    "player-rectangle": null,
+    "league-rectangle": null
+  },
+  "affiliate": {
+    "_shape": "kind -> { label, items: [{ title, url, note }] }. Kinds: club_shirt, national_shirt, player_goods, boots, equipment. `{club}`, `{player}` and `{league}` in a url or title are replaced with the URL-encoded entity name.",
+    "club_shirt": null,
+    "national_shirt": null,
+    "player_goods": null,
+    "boots": null,
+    "equipment": null
+  },
+  "streaming": {
+    "_shape": "league slug -> { label, url, note }. No vendor is ever hardcoded in the view layer.",
+    "premier-league": null,
+    "bundesliga": null,
+    "laliga": null,
+    "serie-a": null,
+    "ligue-1": null,
+    "eredivisie": null,
+    "primeira-liga": null,
+    "scottish-premiership": null,
+    "j1-league": null
+  }
+}

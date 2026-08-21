@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fixture: deliberately malformed feed. Truncated mid-document, one item has no
+  link and another has no closing tag. The collector must record a warning and
+  keep going rather than throwing — a broken feed is a normal Tuesday.
+-->
+<rss version="2.0">
+  <channel>
+    <title>Broken Wire Feed</title>
+    <link>https://example.invalid/broken</link>
+    <item>
+      <title>Headline with no link at all</title>
+      <description>This item can never be stored because there is nothing to attribute it to.</description>
+      <pubDate>Tue, 18 Aug 2026 06:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Unterminated item &amp; stray ampersand &
+      <link>https://example.invalid/broken/2
+      <description>Truncated mid-transmission

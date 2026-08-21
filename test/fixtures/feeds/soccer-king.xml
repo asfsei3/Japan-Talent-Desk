@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fixture: Japanese outlet in Japanese (tier 3, media_jp).
+  Exercises kanji matching, a contract story, and a Japan-relevant article that
+  the prefilter should still reject because it names no tracked entity.
+-->
+<rss version="2.0" xmlns:jfi="https://scout.ai-orchestra.work/ns/jfi">
+  <channel>
+    <title>SOCCER KING</title>
+    <link>https://www.soccer-king.jp</link>
+    <description>サッカーキング｜国内・海外サッカーのニュース</description>
+    <language>ja</language>
+    <jfi:sourceSlug>soccer-king</jfi:sourceSlug>
+    <item>
+      <title>久保建英、レアル・ソシエダと契約延長で合意へ　2029年まで</title>
+      <link>https://www.soccer-king.jp/news/world/liga/20260818/2058311.html</link>
+      <description><![CDATA[日本代表MF久保建英とレアル・ソシエダが契約延長で基本合意に達したと現地紙が報じた。新契約は2029年6月までで、違約金は引き上げられる見通し。]]></description>
+      <pubDate>Tue, 18 Aug 2026 03:30:00 +0900</pubDate>
+      <guid>https://www.soccer-king.jp/news/world/liga/20260818/2058311.html</guid>
+    </item>
+    <item>
+      <title>伊藤洋輝、バイエルンで負傷から復帰　移籍報道を否定</title>
+      <link>https://www.soccer-king.jp/news/world/bundesliga/20260818/2058322.html</link>
+      <description><![CDATA[日本代表DF伊藤洋輝がバイエルン・ミュンヘンで約3カ月ぶりに出場した。移籍に関する報道については「今は何も決まっていない」と語った。]]></description>
+      <pubDate>Tue, 18 Aug 2026 09:10:00 +0900</pubDate>
+      <guid>https://www.soccer-king.jp/news/world/bundesliga/20260818/2058322.html</guid>
+    </item>
+    <item>
+      <title>Ｊ１第２０節　全試合結果と最新順位表</title>
+      <link>https://www.soccer-king.jp/news/japan/jl/20260817/2058299.html</link>
+      <description>Ｊ１リーグ第２０節の全試合結果と最新の順位表をまとめて掲載する。次節は８月２３日に開催される。</description>
+      <pubDate>Mon, 17 Aug 2026 22:45:00 +0900</pubDate>
+      <guid>https://www.soccer-king.jp/news/japan/jl/20260817/2058299.html</guid>
+    </item>
+  </channel>
+</rss>
