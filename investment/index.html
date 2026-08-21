@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="米国上場企業の財務ファンダメンタルズを、SEC提出書類（10-K）から直接調べる検索ツール。投資助言ではありません。"
+    />
+    <meta name="theme-color" content="#0d2b1e" />
+    <title>Investment Intelligence（MVP） | Japan Talent Desk group</title>
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/investment/investment.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">本文へスキップ</a>
+
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="/investment/">Investment Intelligence（MVP）</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero wrap">
+        <p class="eyebrow">企業ファンダメンタルズ検索</p>
+        <h1>会社名・ティッカーで検索して、財務指標をそのまま見る</h1>
+        <p class="lead">
+          米国SECに提出された10-K（年次報告書）のデータをそのまま整理して表示します。買い・売りの判断や目標株価は一切提示しません。データは
+          <a href="https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data" target="_blank" rel="noopener">SEC EDGAR</a>
+          由来（無料・米国政府データ）。現在の株価・時価総額・PERは本MVPでは非対応です（下記「この数字について」参照）。
+        </p>
+
+        <form class="search-box" id="search-form" role="search">
+          <label for="search-input" class="visually-hidden">会社名またはティッカーで検索</label>
+          <input
+            type="search"
+            id="search-input"
+            name="q"
+            placeholder="例: NVDA / NVIDIA / Microsoft / Amazon"
+            autocomplete="off"
+          />
+          <button type="submit" class="button-primary">検索</button>
+        </form>
+      </section>
+
+      <section class="wrap" id="status-area" hidden>
+        <div class="notice" id="status-message"></div>
+      </section>
+
+      <section class="wrap" id="results-area" hidden>
+        <ul class="results-list" id="results-list"></ul>
+      </section>
+
+      <section class="wrap" id="company-area" hidden>
+        <article class="company-card" id="company-card"></article>
+      </section>
+
+      <section class="wrap disclaimer">
+        <h2>この数字について</h2>
+        <p class="fine">
+          これは投資助言ではありません。売買の推奨・目標株価・「買い時」判断は一切行いません。表示している数値はSEC提出書類（10-K、年次報告）由来の直近会計年度のファンダメンタルズであり、リアルタイムの株価・時価総額・PERは含みません（本MVPは無料の財務報告データのみを使用しており、株価データ連携は今後の課題です）。米国SEC提出義務のある上場企業のみ検索対象です。投資判断の前に必ずご自身で一次情報を確認してください。
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p class="fine">Investment Intelligence — MVP（Company Search + Company Page のみ）</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/investment/investment.js"></script>
+  </body>
+</html>
