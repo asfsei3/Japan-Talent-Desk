@@ -10,6 +10,7 @@ import {
   engineCapabilities,
   planTrip,
 } from "./engine/index.js";
+import { getCompanyPage, searchCompanies } from "./engine/investment/index.js";
 import { checkBasicAuth } from "./src/lib/basic-auth.js";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
@@ -337,6 +338,37 @@ function handleSharedTrip(response, token) {
   respondWithPlan(response, "", overrides);
 }
 
+async function handleInvestmentSearch(request, response) {
+  const query = new URLSearchParams((request.url || "").split("?")[1] || "").get("q") || "";
+
+  try {
+    const results = await searchCompanies(query);
+    sendJson(response, 200, { ok: true, results });
+  } catch (error) {
+    console.error("Investment search failed:", error?.message || error);
+    sendJson(response, 502, { ok: false, message: "Could not reach SEC EDGAR right now. Please try again." });
+  }
+}
+
+async function handleInvestmentCompany(request, response, ticker) {
+  try {
+    const page = await getCompanyPage(ticker);
+
+    if (!page.ok) {
+      sendJson(response, 404, {
+        ok: false,
+        message: "この銘柄は見つかりませんでした。SEC提出義務のある米国上場企業のみ対応しています。 / Company not found. Only U.S. SEC filers are supported.",
+      });
+      return;
+    }
+
+    sendJson(response, 200, page);
+  } catch (error) {
+    console.error("Investment company lookup failed:", error?.message || error);
+    sendJson(response, 502, { ok: false, message: "Could not reach SEC EDGAR right now. Please try again." });
+  }
+}
+
 /**
  * Operator portal: one page linking to every product on this domain plus the
  * sibling Payment Intelligence portal on ai-orchestra, so the one person
@@ -367,6 +399,11 @@ function opsPortalPage() {
       name: "Travel Decision Engine",
       href: "/travel/",
       note: "旅行先の自動推薦ツール",
+    },
+    {
+      name: "Investment Intelligence（MVP・本番未検証）",
+      href: "/investment/",
+      note: "企業ファンダメンタルズ検索（SEC EDGAR）。docs/investment/README.md参照",
     },
   ];
 
@@ -452,6 +489,17 @@ createServer((request, response) => {
 
   if (request.method === "GET" && requestPath === "/api/travel/meta") {
     sendJson(response, 200, { ok: true, ...engineCapabilities() });
+    return;
+  }
+
+  if (request.method === "GET" && requestPath === "/api/investment/search") {
+    handleInvestmentSearch(request, response);
+    return;
+  }
+
+  if (request.method === "GET" && requestPath.startsWith("/api/investment/company/")) {
+    const ticker = decodeURIComponent(requestPath.slice("/api/investment/company/".length));
+    handleInvestmentCompany(request, response, ticker);
     return;
   }
 
