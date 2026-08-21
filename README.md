@@ -16,6 +16,7 @@ Public-facing static site for Japan Talent Desk, a Japanese market recruitment i
 │   ├── README.md
 │   ├── newsletter/
 │   ├── outbound/
+│   ├── platform/
 │   ├── reports/
 │   └── strategy/
 ├── index.html
@@ -55,6 +56,7 @@ npm start
 - `docs/outbound/` is for outbound policy, CTA rules, and send workflow notes.
 - `docs/newsletter/` is for Japan Market Weekly process and Brevo-related notes.
 - `docs/reports/` is for sample note structure guidance and report operations.
+- `docs/platform/` is for the forward-looking Vertical Intelligence Platform strategy (shared architecture, monetization, data sources, API costs, legal risks, SEO, moat) — planning only, not a description of current site behavior.
 - `archive/legacy-fsl/` is for internal method references only. FSL should inform the work, not appear in outward JTD messaging.
 
 ## Favicon And Logo Treatment
