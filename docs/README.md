@@ -10,6 +10,12 @@ This folder keeps Japan Talent Desk operating knowledge separate from the public
 - `outbound/`: outbound sequencing, CTA rules, CRM notes, and attachment logic
 - `newsletter/`: Japan Market Weekly notes, editorial rules, and Brevo operating details
 - `reports/`: sample note structure, report principles, and PDF/export workflow
+- `platform/`: forward-looking Vertical Intelligence Platform planning — the
+  shared architecture, business/monetization strategy, data-source and API
+  cost research, legal risks, SEO strategy, and moat plan for running JTD
+  and future verticals (Investment, Shopping, ...) on one shared
+  substrate. Planning only — no shared backend exists in this repo yet. See
+  `platform/README.md`.
 - `travel/`: Travel Decision Engine architecture and limitations
 
 ## Travel Decision Engine

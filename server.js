@@ -10,6 +10,7 @@ import {
   engineCapabilities,
   planTrip,
 } from "./engine/index.js";
+import { checkBasicAuth } from "./src/lib/basic-auth.js";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const envPath = join(root, ".env");
@@ -336,8 +337,104 @@ function handleSharedTrip(response, token) {
   respondWithPlan(response, "", overrides);
 }
 
+/**
+ * Operator portal: one page linking to every product on this domain plus the
+ * sibling Payment Intelligence portal on ai-orchestra, so the one person
+ * running all of this doesn't have to remember URLs. Gated the same way as
+ * JFI's own /intel/admin — 404 (not a login prompt) when JFI_ADMIN_PASSWORD
+ * is unset, so the route's existence isn't confirmed to an unauthenticated
+ * caller, and reuses the same credential rather than adding a second
+ * password to manage.
+ */
+function opsPortalPage() {
+  const links = [
+    {
+      name: "Japan Talent Desk",
+      href: "/",
+      note: "公開LP・ニュースレター登録（B2B、欧州クラブ向け）",
+    },
+    {
+      name: "Japan Football Intelligence（JFI）",
+      href: config.basePath,
+      note: "無料の一般消費者向けダッシュボード（海外組の日本人選手動向）",
+    },
+    {
+      name: "JFI 運用ダッシュボード",
+      href: `${config.basePath}/admin`,
+      note: "収集ジョブの状態・手動実行（同じ認証情報）",
+    },
+    {
+      name: "Travel Decision Engine",
+      href: "/travel/",
+      note: "旅行先の自動推薦ツール",
+    },
+  ];
+
+  const rows = links
+    .map(
+      (link) => `
+        <li class="card">
+          <a href="${link.href}">${link.name}</a>
+          <p>${link.note}</p>
+        </li>`
+    )
+    .join("");
+
+  return `<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Ops Portal — Japan Talent Desk group</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Noto Sans JP", sans-serif; max-width: 640px; margin: 3rem auto; padding: 0 1.5rem; color: #1a2330; }
+  h1 { font-size: 1.4rem; }
+  ul { list-style: none; padding: 0; display: grid; gap: 0.75rem; }
+  .card { border: 1px solid #d8dee6; border-radius: 8px; padding: 0.9rem 1.1rem; }
+  .card a { font-weight: 600; text-decoration: none; color: #14324f; }
+  .card a:hover { text-decoration: underline; }
+  .card p { margin: 0.35rem 0 0; color: #55606e; font-size: 0.92rem; }
+  .external { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #d8dee6; }
+</style>
+</head>
+<body>
+  <h1>Japan Talent Desk group — Ops Portal</h1>
+  <ul>${rows}</ul>
+  <div class="external">
+    <p>決済インテリジェンス事業（AI Orchestra / Payment Intelligence）は別ドメイン:</p>
+    <ul><li class="card"><a href="https://ai-orchestra.work/admin">ai-orchestra.work/admin</a></li></ul>
+  </div>
+</body>
+</html>`;
+}
+
+function handleOpsPortal(request, response) {
+  if (!config.admin.enabled) {
+    response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+    response.end("Not found");
+    return;
+  }
+
+  if (!checkBasicAuth(request.headers.authorization, config.admin.user, config.admin.password)) {
+    response.writeHead(401, {
+      "content-type": "text/plain; charset=utf-8",
+      "www-authenticate": 'Basic realm="jtd-ops"',
+    });
+    response.end("Authentication required.");
+    return;
+  }
+
+  response.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
+  response.end(opsPortalPage());
+}
+
 createServer((request, response) => {
   const requestPath = (request.url || "/").split("?")[0];
+
+  if (requestPath === "/ops") {
+    handleOpsPortal(request, response);
+    return;
+  }
 
   if (request.method === "POST" && requestPath === "/api/travel/plan") {
     handleTravelPlan(request, response).catch((error) => {

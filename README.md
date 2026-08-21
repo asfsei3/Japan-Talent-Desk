@@ -32,6 +32,7 @@ separate product built on the same Node server. See [Travel Decision Engine](#tr
 │   ├── travel/                    Travel Decision Engine pipeline/scoring docs
 │   ├── newsletter/                JTD (B2B) newsletter process
 │   ├── outbound/                  JTD (B2B) outbound policy
+│   ├── platform/                  Vertical Intelligence Platform strategy (planning only)
 │   ├── reports/                   JTD (B2B) report operations
 │   └── strategy/
 │       ├── positioning.md         JTD (B2B) positioning
@@ -118,6 +119,7 @@ npm start
 - `docs/outbound/` is for outbound policy, CTA rules, and send workflow notes.
 - `docs/newsletter/` is for Japan Market Weekly process and Brevo-related notes.
 - `docs/reports/` is for sample note structure guidance and report operations.
+- `docs/platform/` is for the forward-looking Vertical Intelligence Platform strategy (shared architecture, monetization, data sources, API costs, legal risks, SEO, moat) — planning only, not a description of current site behavior.
 - `archive/legacy-fsl/` is for internal method references only. FSL should inform the work, not appear in outward JTD messaging.
 
 ## Favicon And Logo Treatment
