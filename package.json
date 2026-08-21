@@ -1,12 +1,20 @@
 {
-  "name": "japan-talent-desk-site",
-  "version": "1.0.0",
+  "name": "japan-football-intelligence",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "jfi": "node --disable-warning=ExperimentalWarning src/cli.js",
+    "setup": "node --disable-warning=ExperimentalWarning src/cli.js seed",
+    "pipeline": "node --disable-warning=ExperimentalWarning src/cli.js pipeline",
+    "daily": "node --disable-warning=ExperimentalWarning src/cli.js daily",
+    "weekly": "node --disable-warning=ExperimentalWarning src/cli.js weekly",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/**/*.test.js\"",
+    "seo": "node scripts/generate-seo-pages.js"
   },
   "engines": {
-    "node": ">=20"
-  }
+    "node": ">=22.5"
+  },
+  "description": "Japan Football Intelligence platform, the Travel Decision Engine, and the Japan Talent Desk public site."
 }

@@ -3,6 +3,13 @@ import { request as httpsRequest } from "node:https";
 import { extname, join, normalize } from "node:path";
 import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
+import {
+  affiliateConfigFromEnv,
+  affiliateDisclosure,
+  decodeTrip,
+  engineCapabilities,
+  planTrip,
+} from "./engine/index.js";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const envPath = join(root, ".env");
@@ -31,6 +38,39 @@ if (existsSync(envPath)) {
       process.env[key] = value;
     }
   }
+}
+
+const { config } = await import("./src/config/index.js");
+
+/**
+ * The Japan Football Intelligence product is mounted under `config.basePath`
+ * (default `/intel`) so the deployed Japan Talent Desk landing page at `/` is
+ * untouched. Loading it lazily keeps the static site serving even if the
+ * intelligence layer fails to start.
+ */
+let intelHandler = null;
+let intelHandlerFailedAt = 0;
+// A startup failure is retried after a cooldown instead of being cached
+// forever — a transient issue (e.g. a briefly locked SQLite file) at the
+// very first request must not disable /intel for the rest of the process.
+const INTEL_RETRY_COOLDOWN_MS = 30_000;
+
+async function getIntelHandler() {
+  if (intelHandler) return intelHandler;
+  if (intelHandler === false && Date.now() - intelHandlerFailedAt < INTEL_RETRY_COOLDOWN_MS) {
+    return false;
+  }
+
+  try {
+    const { createRequestHandler } = await import("./src/web/server.js");
+    intelHandler = createRequestHandler();
+  } catch (error) {
+    console.error("Japan Football Intelligence routes unavailable:", error?.message || error);
+    intelHandler = false;
+    intelHandlerFailedAt = Date.now();
+  }
+
+  return intelHandler;
 }
 
 const port = Number(process.env.PORT || 3000);
@@ -243,7 +283,101 @@ async function handleNewsletterSignup(request, response) {
   }
 }
 
+const MAX_TRIP_TEXT_LENGTH = 2000;
+
+function respondWithPlan(response, text, overrides) {
+  const plan = planTrip(text, {
+    overrides,
+    affiliateConfig: affiliateConfigFromEnv(),
+  });
+
+  sendJson(response, 200, {
+    ok: true,
+    request: plan.request,
+    result: plan.result,
+    shareToken: plan.shareToken,
+    disclosure: affiliateDisclosure,
+  });
+}
+
+async function handleTravelPlan(request, response) {
+  let payload;
+
+  try {
+    const rawBody = await readRequestBody(request);
+    payload = JSON.parse(rawBody || "{}");
+  } catch {
+    sendJson(response, 400, { ok: false, message: "Invalid request body." });
+    return;
+  }
+
+  const text = String(payload.text || "").slice(0, MAX_TRIP_TEXT_LENGTH).trim();
+  const overrides = payload.overrides && typeof payload.overrides === "object" ? payload.overrides : {};
+
+  if (!text && Object.keys(overrides).length === 0) {
+    sendJson(response, 400, {
+      ok: false,
+      message: "旅行の希望を入力してください。 / Please describe the trip you want.",
+    });
+    return;
+  }
+
+  respondWithPlan(response, text, overrides);
+}
+
+function handleSharedTrip(response, token) {
+  const overrides = decodeTrip(token);
+
+  if (!overrides) {
+    sendJson(response, 404, { ok: false, message: "この共有リンクは読み取れませんでした。 / This shared link could not be read." });
+    return;
+  }
+
+  respondWithPlan(response, "", overrides);
+}
+
 createServer((request, response) => {
+  const requestPath = (request.url || "/").split("?")[0];
+
+  if (request.method === "POST" && requestPath === "/api/travel/plan") {
+    handleTravelPlan(request, response).catch((error) => {
+      console.error("Trip planning failed unexpectedly:", error);
+      sendJson(response, 500, { ok: false, message: "Trip planning failed unexpectedly." });
+    });
+    return;
+  }
+
+  if (request.method === "GET" && requestPath === "/api/travel/plan") {
+    const token = new URLSearchParams((request.url || "").split("?")[1] || "").get("t");
+    handleSharedTrip(response, token);
+    return;
+  }
+
+  if (request.method === "GET" && requestPath === "/api/travel/meta") {
+    sendJson(response, 200, { ok: true, ...engineCapabilities() });
+    return;
+  }
+
+  if (requestPath === config.basePath || requestPath.startsWith(`${config.basePath}/`)) {
+    getIntelHandler()
+      .then((handler) => {
+        if (!handler) {
+          response.writeHead(503, { "content-type": "text/plain; charset=utf-8" });
+          response.end("Japan Football Intelligence is not available.");
+          return;
+        }
+        handler(request, response);
+      })
+      .catch((error) => {
+        console.error("Intelligence route failed:", error);
+        if (!response.headersSent) {
+          response.writeHead(500, { "content-type": "text/plain; charset=utf-8" });
+        }
+        response.end("Internal error");
+      });
+    return;
+  }
+
   if (request.method === "POST" && request.url === "/api/newsletter") {
     handleNewsletterSignup(request, response).catch((error) => {
       console.error("Newsletter signup failed unexpectedly:", error);
@@ -269,5 +403,5 @@ createServer((request, response) => {
   });
   createReadStream(filePath).pipe(response);
 }).listen(port, () => {
-  console.log(`Japan Talent Desk static site running on port ${port}`);
+  console.log(`Japan Talent Desk site + Travel Decision Engine running on port ${port} · JFI mounted at ${config.basePath}`);
 });

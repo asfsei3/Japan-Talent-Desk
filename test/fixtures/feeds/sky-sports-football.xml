@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fixture: second European outlet in English (tier 2).
+  The first item is a deliberate rewrite of the Guardian injury story — the same
+  wire story reworded by another desk — so near-duplicate detection is exercised.
+-->
+<rss version="2.0" xmlns:jfi="https://scout.ai-orchestra.work/ns/jfi">
+  <channel>
+    <title>Sky Sports — Football</title>
+    <link>https://www.skysports.com/football</link>
+    <description>Football news and transfer centre</description>
+    <language>en</language>
+    <jfi:sourceSlug>sky-sports-football</jfi:sourceSlug>
+    <item>
+      <title>Kaoru Mitoma ruled out for six weeks with ankle ligament damage</title>
+      <link>https://www.skysports.com/football/news/11095/13456789/kaoru-mitoma-ruled-out-six-weeks-ankle-ligament-damage</link>
+      <description><![CDATA[Brighton's head coach has confirmed the Japan winger will miss the next six weeks, after scans revealed ligament damage in his right ankle which was sustained against Everton on Saturday.]]></description>
+      <pubDate>Tue, 18 Aug 2026 13:02:00 GMT</pubDate>
+      <guid>https://www.skysports.com/football/news/11095/13456789</guid>
+    </item>
+    <item>
+      <title>Ito targeted by Premier League clubs after impressive season</title>
+      <link>https://www.skysports.com/football/news/11095/13456999/ito-targeted-by-premier-league-clubs</link>
+      <description>Two top-flight sides are weighing an approach for the Japan international this summer, according to sources, with a bid expected before the window shuts.</description>
+      <pubDate>Mon, 17 Aug 2026 16:20:00 GMT</pubDate>
+      <guid>https://www.skysports.com/football/news/11095/13456999</guid>
+    </item>
+  </channel>
+</rss>
