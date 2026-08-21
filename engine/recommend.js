@@ -320,10 +320,29 @@ export function recommendTrips(request, options = {}) {
     (a, b) => b.scores.composite - a.scores.composite
   );
 
+  // The "overall" category's candidate is always ranked[0] by construction
+  // (pickCategories), so without memoizing, presentCandidate's 12-month
+  // analyzeTiming sweep runs twice for the identical (candidate, categoryKey)
+  // pair on every request. Keyed on the candidate object itself (not a
+  // derived string) plus categoryKey, since categoryReason's explanation text
+  // legitimately differs by category for the same candidate.
+  const presentedCache = new WeakMap();
+  function present(candidate, categoryKey) {
+    let byCategory = presentedCache.get(candidate);
+    if (!byCategory) {
+      byCategory = new Map();
+      presentedCache.set(candidate, byCategory);
+    }
+    if (!byCategory.has(categoryKey)) {
+      byCategory.set(categoryKey, presentCandidate(request, candidate, configurations, categoryKey, affiliateConfig));
+    }
+    return byCategory.get(categoryKey);
+  }
+
   const categories = pickCategories(request, ranked, configurations).map((category) => ({
     key: category.key,
     label: category.label,
-    recommendation: presentCandidate(request, category.candidate, configurations, category.key, affiliateConfig),
+    recommendation: present(category.candidate, category.key),
   }));
 
   const cheapestYen = Math.min(...configurations.map((configuration) => configuration.cost.totalYen));
@@ -348,9 +367,7 @@ export function recommendTrips(request, options = {}) {
     weights,
     budgetFit,
     categories,
-    ranked: ranked
-      .slice(0, limit)
-      .map((candidate) => presentCandidate(request, candidate, configurations, "overall", affiliateConfig)),
+    ranked: ranked.slice(0, limit).map((candidate) => present(candidate, "overall")),
     consideredDestinations: new Set(configurations.map((configuration) => configuration.destination.id)).size,
     consideredConfigurations: configurations.length,
     disclaimer: {

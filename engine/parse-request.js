@@ -302,10 +302,12 @@ function parseInterests(text) {
 }
 
 function parseConstraints(text) {
-  const noCar = /車\s*(?:は)?\s*(?:なし|使わ|乗らな)|運転\s*(?:は)?\s*(?:しな|しませ|できな|できませ|苦手|無理|むり)|ペーパードライバー|no car|without a car|can'?t drive|don'?t drive/i.test(text);
+  // Word-boundaried: a bare "no car" / bare "楽" would also match "no
+  // carbohydrates" and common unrelated words like 音楽/娯楽/極楽/楽天/楽しい.
+  const noCar = /車\s*(?:は)?\s*(?:なし|使わ|乗らな)|運転\s*(?:は)?\s*(?:しな|しませ|できな|できませ|苦手|無理|むり)|ペーパードライバー|\bno car\b|\bwithout a car\b|\bcan'?t drive\b|\bdon'?t drive\b/i.test(text);
 
   return {
-    easyTransport: /楽|らく|乗り換え(?:なし|が?少|たくない)|直行|移動(?:時間)?(?:が|は)?短|近場|easy (?:transport|travel|access)|direct|minimal transfers|no transfers/i.test(text),
+    easyTransport: /楽に|楽な|らくらく|気楽|乗り換え(?:なし|が?少|たくない)|直行|移動(?:時間)?(?:が|は)?短|近場|\beasy (?:transport|travel|access)\b|\bdirect\b|\bminimal transfers\b|\bno transfers\b/i.test(text),
     noCar,
     car: !noCar && /車で|レンタカー|ドライブ|マイカー|自家用車|rental car|by car|drive/i.test(text),
     stroller: /ベビーカー|stroller|buggy|pram/i.test(text),
