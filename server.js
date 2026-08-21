@@ -42,9 +42,17 @@ const { config } = await import("./src/config/index.js");
  * intelligence layer fails to start.
  */
 let intelHandler = null;
+let intelHandlerFailedAt = 0;
+// A startup failure is retried after a cooldown instead of being cached
+// forever — a transient issue (e.g. a briefly locked SQLite file) at the
+// very first request must not disable /intel for the rest of the process.
+const INTEL_RETRY_COOLDOWN_MS = 30_000;
 
 async function getIntelHandler() {
-  if (intelHandler !== null) return intelHandler;
+  if (intelHandler) return intelHandler;
+  if (intelHandler === false && Date.now() - intelHandlerFailedAt < INTEL_RETRY_COOLDOWN_MS) {
+    return false;
+  }
 
   try {
     const { createRequestHandler } = await import("./src/web/server.js");
@@ -52,6 +60,7 @@ async function getIntelHandler() {
   } catch (error) {
     console.error("Japan Football Intelligence routes unavailable:", error?.message || error);
     intelHandler = false;
+    intelHandlerFailedAt = Date.now();
   }
 
   return intelHandler;

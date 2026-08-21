@@ -178,11 +178,19 @@ export function detectChanges({ asOfDate } = {}) {
       const rising = row.score > previous.score;
       const label = signalType === "transfer" ? "transfer signal" : "Japan Market Score";
       const labelJa = signalType === "transfer" ? "移籍シグナル" : "日本市場スコア";
-      const sources = get(
-        `SELECT COALESCE(SUM(source_count), 0) AS n FROM events
-          WHERE player_id = ? AND status = 'active' AND type = 'transfer'`,
-        row.entity_id
-      ).n;
+      // transfer signal evidence lives on transfer events; japan_market is
+      // computed from metrics rows, so the two need different source counts.
+      const sources = signalType === "transfer"
+        ? get(
+            `SELECT COALESCE(SUM(source_count), 0) AS n FROM events
+              WHERE player_id = ? AND status = 'active' AND type = 'transfer'`,
+            row.entity_id
+          ).n
+        : get(
+            `SELECT COUNT(DISTINCT metric_key) AS n FROM metrics
+              WHERE entity_type = 'player' AND entity_id = ? AND as_of_date <= ?`,
+            row.entity_id, date
+          ).n;
 
       emit({
         entityId: row.entity_id,

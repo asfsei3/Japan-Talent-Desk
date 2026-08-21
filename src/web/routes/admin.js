@@ -11,6 +11,7 @@
  * (`10-architecture.md` "Backup: external trigger") for when the in-process
  * tick is suspected wedged or a run needs to be forced by hand.
  */
+import { timingSafeEqual } from "node:crypto";
 import { all, get } from "../../db/client.js";
 import { config } from "../../config/index.js";
 import { withJobRun } from "../../jobs/run-tracking.js";
@@ -52,6 +53,17 @@ ${body}
 </html>`;
 }
 
+function safeEqual(a, b) {
+  const bufA = Buffer.from(String(a));
+  const bufB = Buffer.from(String(b));
+  if (bufA.length !== bufB.length) {
+    // Compare against a same-length dummy so the mismatch doesn't leak length via timing.
+    timingSafeEqual(bufA, Buffer.alloc(bufA.length));
+    return false;
+  }
+  return timingSafeEqual(bufA, bufB);
+}
+
 function requireAuth(ctx) {
   const header = String(ctx.request.headers.authorization ?? "");
   const [scheme, encoded] = header.split(" ");
@@ -65,7 +77,7 @@ function requireAuth(ctx) {
   const separator = decoded.indexOf(":");
   const user = separator === -1 ? decoded : decoded.slice(0, separator);
   const pass = separator === -1 ? "" : decoded.slice(separator + 1);
-  return user === config.admin.user && pass === config.admin.password;
+  return safeEqual(user, config.admin.user) && safeEqual(pass, config.admin.password);
 }
 
 function unauthorized() {

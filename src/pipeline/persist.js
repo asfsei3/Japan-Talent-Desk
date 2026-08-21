@@ -135,12 +135,16 @@ function queueReview({ eventId, reason, detail, priority }) {
 /** Transfer claims that share a player and a window but name different clubs. */
 function conflictingSiblings(event) {
   if (event.type !== "transfer" || !event.player_id) return [];
+  // Counterparty must match buildDedupeKey's own fallback chain, or two
+  // claims that both only set the generic club_id (no stated direction)
+  // never get flagged as conflicting.
+  const counterparty = event.to_club_id ?? event.club_id ?? event.from_club_id ?? null;
   return all(
-    `SELECT id, headline, to_club_id, subtype FROM events
+    `SELECT id, headline, to_club_id, club_id, from_club_id, subtype FROM events
       WHERE player_id = ? AND type = 'transfer' AND status = 'active' AND id != ?
-        AND subtype = ? AND COALESCE(to_club_id, 0) != COALESCE(?, 0)
+        AND subtype = ? AND COALESCE(to_club_id, club_id, from_club_id, 0) != COALESCE(?, 0)
         AND abs(julianday(COALESCE(occurred_at, detected_at)) - julianday(COALESCE(?, detected_at))) <= ?`,
-    event.player_id, event.id, event.subtype, event.to_club_id, event.occurred_at, BUCKET_DAYS
+    event.player_id, event.id, event.subtype, counterparty, event.occurred_at, BUCKET_DAYS
   );
 }
 
