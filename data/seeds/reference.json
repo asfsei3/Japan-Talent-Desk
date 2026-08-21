@@ -1,0 +1,41 @@
+{
+  "countries": [
+    { "code": "JP", "name_en": "Japan", "name_ja": "日本", "confederation": "AFC", "market_priority": 1 },
+    { "code": "KR", "name_en": "South Korea", "name_ja": "韓国", "confederation": "AFC", "market_priority": 2 },
+    { "code": "AU", "name_en": "Australia", "name_ja": "オーストラリア", "confederation": "AFC", "market_priority": 2 },
+    { "code": "CN", "name_en": "China", "name_ja": "中国", "confederation": "AFC", "market_priority": 3 },
+    { "code": "SA", "name_en": "Saudi Arabia", "name_ja": "サウジアラビア", "confederation": "AFC", "market_priority": 3 },
+    { "code": "IR", "name_en": "Iran", "name_ja": "イラン", "confederation": "AFC", "market_priority": 3 },
+    { "code": "GB", "name_en": "United Kingdom", "name_ja": "イギリス", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "DE", "name_en": "Germany", "name_ja": "ドイツ", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "ES", "name_en": "Spain", "name_ja": "スペイン", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "IT", "name_en": "Italy", "name_ja": "イタリア", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "FR", "name_en": "France", "name_ja": "フランス", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "NL", "name_en": "Netherlands", "name_ja": "オランダ", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "BE", "name_en": "Belgium", "name_ja": "ベルギー", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "PT", "name_en": "Portugal", "name_ja": "ポルトガル", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "AT", "name_en": "Austria", "name_ja": "オーストリア", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "DK", "name_en": "Denmark", "name_ja": "デンマーク", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "CH", "name_en": "Switzerland", "name_ja": "スイス", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "SCT", "name_en": "Scotland", "name_ja": "スコットランド", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "PL", "name_en": "Poland", "name_ja": "ポーランド", "confederation": "UEFA", "market_priority": 0 },
+    { "code": "US", "name_en": "United States", "name_ja": "アメリカ", "confederation": "CONCACAF", "market_priority": 0 }
+  ],
+  "leagues": [
+    { "slug": "premier-league", "name_en": "Premier League", "name_ja": "プレミアリーグ", "country_code": "GB", "tier": 1, "confederation": "UEFA", "jp_visibility": 100 },
+    { "slug": "efl-championship", "name_en": "EFL Championship", "name_ja": "チャンピオンシップ", "country_code": "GB", "tier": 2, "confederation": "UEFA", "jp_visibility": 55 },
+    { "slug": "bundesliga", "name_en": "Bundesliga", "name_ja": "ブンデスリーガ", "country_code": "DE", "tier": 1, "confederation": "UEFA", "jp_visibility": 92 },
+    { "slug": "2-bundesliga", "name_en": "2. Bundesliga", "name_ja": "ブンデスリーガ2部", "country_code": "DE", "tier": 2, "confederation": "UEFA", "jp_visibility": 48 },
+    { "slug": "laliga", "name_en": "LaLiga", "name_ja": "ラ・リーガ", "country_code": "ES", "tier": 1, "confederation": "UEFA", "jp_visibility": 88 },
+    { "slug": "serie-a", "name_en": "Serie A", "name_ja": "セリエA", "country_code": "IT", "tier": 1, "confederation": "UEFA", "jp_visibility": 84 },
+    { "slug": "ligue-1", "name_en": "Ligue 1", "name_ja": "リーグ・アン", "country_code": "FR", "tier": 1, "confederation": "UEFA", "jp_visibility": 70 },
+    { "slug": "eredivisie", "name_en": "Eredivisie", "name_ja": "エールディヴィジ", "country_code": "NL", "tier": 1, "confederation": "UEFA", "jp_visibility": 58 },
+    { "slug": "jupiler-pro-league", "name_en": "Belgian Pro League", "name_ja": "ジュピラー・プロリーグ", "country_code": "BE", "tier": 1, "confederation": "UEFA", "jp_visibility": 50 },
+    { "slug": "primeira-liga", "name_en": "Primeira Liga", "name_ja": "プリメイラ・リーガ", "country_code": "PT", "tier": 1, "confederation": "UEFA", "jp_visibility": 44 },
+    { "slug": "scottish-premiership", "name_en": "Scottish Premiership", "name_ja": "スコティッシュ・プレミアシップ", "country_code": "SCT", "tier": 1, "confederation": "UEFA", "jp_visibility": 62 },
+    { "slug": "austrian-bundesliga", "name_en": "Austrian Bundesliga", "name_ja": "オーストリア・ブンデスリーガ", "country_code": "AT", "tier": 1, "confederation": "UEFA", "jp_visibility": 34 },
+    { "slug": "superliga", "name_en": "Danish Superliga", "name_ja": "スーペルリーガ", "country_code": "DK", "tier": 1, "confederation": "UEFA", "jp_visibility": 30 },
+    { "slug": "swiss-super-league", "name_en": "Swiss Super League", "name_ja": "スイス・スーパーリーグ", "country_code": "CH", "tier": 1, "confederation": "UEFA", "jp_visibility": 28 },
+    { "slug": "j1-league", "name_en": "J1 League", "name_ja": "J1リーグ", "country_code": "JP", "tier": 1, "confederation": "AFC", "jp_visibility": 100 }
+  ]
+}

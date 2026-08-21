@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fixture: official club feed (tier 1, official_club), Atom 1.0.
+  Only a tier-1 source can produce a CONFIRMED completed-transfer event, so the
+  offline pipeline needs one. The second entry is club filler that the prefilter
+  must still reject — a trusted source is not a free pass.
+-->
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:jfi="https://scout.ai-orchestra.work/ns/jfi">
+  <title>Brighton &amp; Hove Albion — Official News</title>
+  <link rel="alternate" href="https://www.brightonandhovealbion.com/news/"/>
+  <updated>2026-08-19T09:00:00Z</updated>
+  <jfi:sourceSlug>brighton-official</jfi:sourceSlug>
+  <entry>
+    <title>Albion complete signing of Kota Takai from Tottenham Hotspur</title>
+    <link rel="alternate" href="https://www.brightonandhovealbion.com/news/2026/08/19/kota-takai-signs"/>
+    <id>tag:brightonandhovealbion.com,2026-08-19:/news/kota-takai-signs</id>
+    <published>2026-08-19T09:00:00Z</published>
+    <updated>2026-08-19T09:00:00Z</updated>
+    <summary type="html">&lt;p&gt;Brighton &amp;amp; Hove Albion have completed the permanent signing of Japan defender Kota Takai from Tottenham Hotspur. The 21-year-old has signed a four-year contract, subject to international clearance.&lt;/p&gt;</summary>
+  </entry>
+  <entry>
+    <title>Under-21s confirm pre-season fixture schedule</title>
+    <link rel="alternate" href="https://www.brightonandhovealbion.com/news/2026/08/15/u21-pre-season-fixtures"/>
+    <id>tag:brightonandhovealbion.com,2026-08-15:/news/u21-pre-season-fixtures</id>
+    <published>2026-08-15T12:30:00Z</published>
+    <summary>The young side will play four matches before the campaign begins, with all games open to season-ticket holders.</summary>
+  </entry>
+</feed>

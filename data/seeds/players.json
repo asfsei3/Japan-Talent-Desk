@@ -1,0 +1,470 @@
+[
+  {
+    "slug": "kaoru-mitoma",
+    "name_en": "Kaoru Mitoma",
+    "name_ja": "三笘薫",
+    "name_kana": "みとまかおる",
+    "birth_date": "1997-05-20",
+    "position": "LW",
+    "club": "brighton",
+    "national_team": "senior",
+    "aliases": [
+      "Mitoma",
+      "三笘",
+      "ミトマ"
+    ]
+  },
+  {
+    "slug": "takefusa-kubo",
+    "name_en": "Takefusa Kubo",
+    "name_ja": "久保建英",
+    "name_kana": "くぼたけふさ",
+    "birth_date": "2001-06-04",
+    "position": "RW",
+    "club": "real-sociedad",
+    "national_team": "senior",
+    "aliases": [
+      "Kubo",
+      "久保",
+      "Take Kubo",
+      "クボ"
+    ]
+  },
+  {
+    "slug": "wataru-endo",
+    "name_en": "Wataru Endo",
+    "name_ja": "遠藤航",
+    "name_kana": "えんどうわたる",
+    "birth_date": "1993-02-09",
+    "position": "DM",
+    "club": "liverpool",
+    "national_team": "senior",
+    "aliases": [
+      "Endo",
+      "遠藤航",
+      "エンドウ"
+    ]
+  },
+  {
+    "slug": "takehiro-tomiyasu",
+    "name_en": "Takehiro Tomiyasu",
+    "name_ja": "冨安健洋",
+    "name_kana": "とみやすたけひろ",
+    "birth_date": "1998-11-05",
+    "position": "CB",
+    "club": "arsenal",
+    "national_team": "senior",
+    "aliases": [
+      "Tomiyasu",
+      "冨安",
+      "トミヤス"
+    ]
+  },
+  {
+    "slug": "daichi-kamada",
+    "name_en": "Daichi Kamada",
+    "name_ja": "鎌田大地",
+    "name_kana": "かまだだいち",
+    "birth_date": "1996-08-05",
+    "position": "AM",
+    "club": "crystal-palace",
+    "national_team": "senior",
+    "aliases": [
+      "Kamada",
+      "鎌田",
+      "カマダ"
+    ]
+  },
+  {
+    "slug": "ritsu-doan",
+    "name_en": "Ritsu Doan",
+    "name_ja": "堂安律",
+    "name_kana": "どうあんりつ",
+    "birth_date": "1998-06-16",
+    "position": "RW",
+    "club": "eintracht-frankfurt",
+    "national_team": "senior",
+    "aliases": [
+      "Doan",
+      "堂安",
+      "ドウアン"
+    ]
+  },
+  {
+    "slug": "ao-tanaka",
+    "name_en": "Ao Tanaka",
+    "name_ja": "田中碧",
+    "name_kana": "たなかあお",
+    "birth_date": "1998-09-10",
+    "position": "CM",
+    "club": "leeds-united",
+    "national_team": "senior",
+    "aliases": [
+      "Tanaka",
+      "田中碧",
+      "タナカ"
+    ]
+  },
+  {
+    "slug": "hiroki-ito",
+    "name_en": "Hiroki Ito",
+    "name_ja": "伊藤洋輝",
+    "name_kana": "いとうひろき",
+    "birth_date": "1999-05-12",
+    "position": "CB",
+    "club": "bayern-munich",
+    "national_team": "senior",
+    "aliases": [
+      "Ito",
+      "伊藤洋輝",
+      "Hiroki Itō"
+    ]
+  },
+  {
+    "slug": "junya-ito",
+    "name_en": "Junya Ito",
+    "name_ja": "伊東純也",
+    "name_kana": "いとうじゅんや",
+    "birth_date": "1993-03-09",
+    "position": "RW",
+    "club": "stade-de-reims",
+    "national_team": "senior",
+    "aliases": [
+      "Ito",
+      "Junya Ito",
+      "伊東純也",
+      "Junya Itō"
+    ]
+  },
+  {
+    "slug": "keito-nakamura",
+    "name_en": "Keito Nakamura",
+    "name_ja": "中村敬斗",
+    "name_kana": "なかむらけいと",
+    "birth_date": "2000-07-28",
+    "position": "LW",
+    "club": "stade-de-reims",
+    "national_team": "senior",
+    "aliases": [
+      "Nakamura",
+      "中村敬斗",
+      "ナカムラ"
+    ]
+  },
+  {
+    "slug": "ayase-ueda",
+    "name_en": "Ayase Ueda",
+    "name_ja": "上田綺世",
+    "name_kana": "うえだあやせ",
+    "birth_date": "1998-08-28",
+    "position": "ST",
+    "club": "feyenoord",
+    "national_team": "senior",
+    "aliases": [
+      "Ueda",
+      "上田綺世",
+      "ウエダ"
+    ]
+  },
+  {
+    "slug": "daizen-maeda",
+    "name_en": "Daizen Maeda",
+    "name_ja": "前田大然",
+    "name_kana": "まえだだいぜん",
+    "birth_date": "1997-10-20",
+    "position": "LW",
+    "club": "celtic",
+    "national_team": "senior",
+    "aliases": [
+      "Maeda",
+      "前田大然",
+      "マエダ"
+    ]
+  },
+  {
+    "slug": "reo-hatate",
+    "name_en": "Reo Hatate",
+    "name_ja": "旗手怜央",
+    "name_kana": "はたてれお",
+    "birth_date": "1997-11-21",
+    "position": "CM",
+    "club": "celtic",
+    "national_team": "senior",
+    "aliases": [
+      "Hatate",
+      "旗手",
+      "ハタテ"
+    ]
+  },
+  {
+    "slug": "kyogo-furuhashi",
+    "name_en": "Kyogo Furuhashi",
+    "name_ja": "古橋亨梧",
+    "name_kana": "ふるはしきょうご",
+    "birth_date": "1995-01-20",
+    "position": "ST",
+    "club": "stade-rennais",
+    "national_team": "senior",
+    "aliases": [
+      "Kyogo",
+      "古橋",
+      "Furuhashi",
+      "キョウゴ"
+    ]
+  },
+  {
+    "slug": "zion-suzuki",
+    "name_en": "Zion Suzuki",
+    "name_ja": "鈴木彩艶",
+    "name_kana": "すずきざいおん",
+    "birth_date": "2002-08-21",
+    "position": "GK",
+    "club": "parma",
+    "national_team": "senior",
+    "aliases": [
+      "Suzuki",
+      "鈴木彩艶",
+      "ザイオン"
+    ]
+  },
+  {
+    "slug": "kota-takai",
+    "name_en": "Kota Takai",
+    "name_ja": "高井幸大",
+    "name_kana": "たかいこうた",
+    "birth_date": "2004-09-04",
+    "position": "CB",
+    "club": "tottenham",
+    "national_team": "senior",
+    "aliases": [
+      "Takai",
+      "高井",
+      "タカイ"
+    ]
+  },
+  {
+    "slug": "yukinari-sugawara",
+    "name_en": "Yukinari Sugawara",
+    "name_ja": "菅原由勢",
+    "name_kana": "すがわらゆきなり",
+    "birth_date": "2000-06-28",
+    "position": "RB",
+    "club": "southampton",
+    "national_team": "senior",
+    "aliases": [
+      "Sugawara",
+      "菅原",
+      "スガワラ"
+    ]
+  },
+  {
+    "slug": "koki-machida",
+    "name_en": "Koki Machida",
+    "name_ja": "町田浩樹",
+    "name_kana": "まちだこうき",
+    "birth_date": "1997-08-25",
+    "position": "CB",
+    "club": "lazio",
+    "national_team": "senior",
+    "aliases": [
+      "Machida",
+      "町田浩樹",
+      "マチダ"
+    ]
+  },
+  {
+    "slug": "takumi-minamino",
+    "name_en": "Takumi Minamino",
+    "name_ja": "南野拓実",
+    "name_kana": "みなみのたくみ",
+    "birth_date": "1995-01-16",
+    "position": "AM",
+    "club": "monaco",
+    "national_team": "senior",
+    "aliases": [
+      "Minamino",
+      "南野",
+      "ミナミノ"
+    ]
+  },
+  {
+    "slug": "hidemasa-morita",
+    "name_en": "Hidemasa Morita",
+    "name_ja": "守田英正",
+    "name_kana": "もりたひでまさ",
+    "birth_date": "1995-05-10",
+    "position": "CM",
+    "club": "sporting-cp",
+    "national_team": "senior",
+    "aliases": [
+      "Morita",
+      "守田",
+      "モリタ"
+    ]
+  },
+  {
+    "slug": "yuito-suzuki",
+    "name_en": "Yuito Suzuki",
+    "name_ja": "鈴木唯人",
+    "name_kana": "すずきゆいと",
+    "birth_date": "2001-07-24",
+    "position": "AM",
+    "club": "vfb-stuttgart",
+    "national_team": "senior",
+    "aliases": [
+      "Yuito Suzuki",
+      "鈴木唯人",
+      "ユイト"
+    ]
+  },
+  {
+    "slug": "shuto-machino",
+    "name_en": "Shuto Machino",
+    "name_ja": "町野修斗",
+    "name_kana": "まちのしゅうと",
+    "birth_date": "1999-09-30",
+    "position": "ST",
+    "club": "borussia-monchengladbach",
+    "national_team": "senior",
+    "aliases": [
+      "Machino",
+      "町野",
+      "マチノ"
+    ]
+  },
+  {
+    "slug": "tatsuhiro-sakamoto",
+    "name_en": "Tatsuhiro Sakamoto",
+    "name_ja": "坂元達裕",
+    "name_kana": "さかもとたつひろ",
+    "birth_date": "1996-06-15",
+    "position": "RW",
+    "club": "coventry-city",
+    "national_team": "none",
+    "aliases": [
+      "Sakamoto",
+      "坂元",
+      "サカモト"
+    ]
+  },
+  {
+    "slug": "keisuke-goto",
+    "name_en": "Keisuke Goto",
+    "name_ja": "後藤啓介",
+    "name_kana": "ごとうけいすけ",
+    "birth_date": "2004-04-07",
+    "position": "ST",
+    "club": "sint-truiden",
+    "national_team": "u23",
+    "aliases": [
+      "Goto",
+      "後藤啓介",
+      "ゴトウ"
+    ]
+  },
+  {
+    "slug": "ryotaro-ito",
+    "name_en": "Ryotaro Ito",
+    "name_ja": "伊藤涼太郎",
+    "name_kana": "いとうりょうたろう",
+    "birth_date": "1998-05-27",
+    "position": "AM",
+    "club": "sint-truiden",
+    "national_team": "none",
+    "aliases": [
+      "Ryotaro Ito",
+      "伊藤涼太郎",
+      "リョウタロウ"
+    ]
+  },
+  {
+    "slug": "yuma-suzuki",
+    "name_en": "Yuma Suzuki",
+    "name_ja": "鈴木優磨",
+    "name_kana": "すずきゆうま",
+    "birth_date": "1996-04-26",
+    "position": "ST",
+    "club": "kashima-antlers",
+    "national_team": "senior",
+    "aliases": [
+      "Yuma Suzuki",
+      "鈴木優磨",
+      "ユウマ"
+    ]
+  },
+  {
+    "slug": "sota-kitano",
+    "name_en": "Sota Kitano",
+    "name_ja": "北野颯太",
+    "name_kana": "きたのそうた",
+    "birth_date": "2005-04-24",
+    "position": "AM",
+    "club": "rb-salzburg",
+    "national_team": "u23",
+    "aliases": [
+      "Kitano",
+      "北野",
+      "キタノ"
+    ]
+  },
+  {
+    "slug": "mao-hosoya",
+    "name_en": "Mao Hosoya",
+    "name_ja": "細谷真大",
+    "name_kana": "ほそやまお",
+    "birth_date": "2001-09-07",
+    "position": "ST",
+    "club": "kashiwa-reysol",
+    "national_team": "senior",
+    "aliases": [
+      "Hosoya",
+      "細谷",
+      "ホソヤ"
+    ]
+  },
+  {
+    "slug": "kosei-tani",
+    "name_en": "Kosei Tani",
+    "name_ja": "谷晃生",
+    "name_kana": "たにこうせい",
+    "birth_date": "2000-11-22",
+    "position": "GK",
+    "club": "birmingham-city",
+    "national_team": "senior",
+    "aliases": [
+      "Tani",
+      "谷晃生",
+      "タニ"
+    ]
+  },
+  {
+    "slug": "kaishu-sano",
+    "name_en": "Kaishu Sano",
+    "name_ja": "佐野海舟",
+    "name_kana": "さのかいしゅう",
+    "birth_date": "2001-01-30",
+    "position": "DM",
+    "club": "mainz-05",
+    "national_team": "senior",
+    "aliases": [
+      "Sano",
+      "佐野海舟",
+      "サノ"
+    ]
+  },
+  {
+    "slug": "kento-misao",
+    "name_en": "Kento Misao",
+    "name_ja": "三竿健斗",
+    "name_kana": "みさおけんと",
+    "birth_date": "1996-04-16",
+    "position": "DM",
+    "club": "kashima-antlers",
+    "national_team": "none",
+    "aliases": [
+      "Misao",
+      "三竿",
+      "ミサオ"
+    ]
+  }
+]

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fixture: European outlet in English (tier 2, media_eu).
+  Impersonates the seeded `guardian-football` source so offline runs exercise a
+  realistic source tier. Bodies are invented; no real article text is stored.
+-->
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:jfi="https://scout.ai-orchestra.work/ns/jfi">
+  <channel>
+    <title>The Guardian — Football</title>
+    <link>https://www.theguardian.com/football</link>
+    <description>Football news, match reports and transfer coverage</description>
+    <language>en</language>
+    <jfi:sourceSlug>guardian-football</jfi:sourceSlug>
+    <item>
+      <title>Liverpool weigh January move for Bayern Munich defender Hiroki Ito</title>
+      <link>https://www.theguardian.com/football/2026/aug/18/liverpool-hiroki-ito-bayern-munich-january</link>
+      <description><![CDATA[<p>Liverpool have made initial contact over the Japan international, who has struggled for minutes at Bayern Munich since returning from a foot injury. Any deal would depend on the defender's contract situation, with 18 months left to run.</p>]]></description>
+      <pubDate>Tue, 18 Aug 2026 07:15:00 GMT</pubDate>
+      <dc:creator>Fabrizio Example</dc:creator>
+      <guid isPermaLink="true">https://www.theguardian.com/football/2026/aug/18/liverpool-hiroki-ito-bayern-munich-january</guid>
+    </item>
+    <item>
+      <title>Kaoru Mitoma out for six weeks with ankle ligament damage</title>
+      <link>https://www.theguardian.com/football/2026/aug/18/kaoru-mitoma-injury-brighton-ankle</link>
+      <description><![CDATA[Brighton's head coach confirmed the Japan winger will miss the next six weeks after scans revealed ligament damage in his right ankle sustained against Everton on Saturday.]]></description>
+      <pubDate>Tue, 18 Aug 2026 11:40:00 GMT</pubDate>
+      <guid isPermaLink="true">https://www.theguardian.com/football/2026/aug/18/kaoru-mitoma-injury-brighton-ankle</guid>
+    </item>
+    <item>
+      <title>Bayern head coach addresses Hiroki Ito's future amid quiet form</title>
+      <link>https://www.theguardian.com/football/2026/aug/19/bayern-hiroki-ito-head-coach-comments</link>
+      <description><![CDATA[Bayern Munich's head coach said the defender needs to improve his fitness after a stop-start season, and admitted the club will have to assess his options if his form does not pick up before January.]]></description>
+      <pubDate>Wed, 19 Aug 2026 10:20:00 GMT</pubDate>
+      <guid isPermaLink="true">https://www.theguardian.com/football/2026/aug/19/bayern-hiroki-ito-head-coach-comments</guid>
+    </item>
+    <item>
+      <title>Reims duo Ito and Nakamura shine in Ligue 1 win at Lens</title>
+      <link>https://www.theguardian.com/football/2026/aug/17/reims-ito-nakamura-ligue-1-lens</link>
+      <description>Stade de Reims moved up to fifth after a 3-1 win, with both Japan internationals scoring in the second half.</description>
+      <pubDate>Mon, 17 Aug 2026 21:05:00 GMT</pubDate>
+      <guid isPermaLink="true">https://www.theguardian.com/football/2026/aug/17/reims-ito-nakamura-ligue-1-lens</guid>
+    </item>
+    <item>
+      <title>Wembley to host the 2027 Women&#39;s Champions League final</title>
+      <link>https://www.theguardian.com/football/2026/aug/17/wembley-2027-womens-champions-league-final</link>
+      <description>Uefa has confirmed that the showpiece will be staged in London for the first time since 2011, with tickets going on sale in November.</description>
+      <pubDate>Mon, 17 Aug 2026 09:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://www.theguardian.com/football/2026/aug/17/wembley-2027-womens-champions-league-final</guid>
+    </item>
+  </channel>
+</rss>
