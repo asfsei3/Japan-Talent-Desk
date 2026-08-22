@@ -39,6 +39,8 @@ separate product built on the same Node server. See [Travel Decision Engine](#tr
 │       └── jfi/                   JFI architecture, data model, cost model, automation plan
 ├── engine/                        Travel Decision Engine core (cost model, scoring, parsing)
 │   ├── data/
+│   ├── investment/                 Investment Intelligence core (SEC EDGAR client, fundamentals)
+│   ├── telecom/                    Telecom Optimization core (plan dataset, recommendation engine)
 │   ├── affiliate.js
 │   ├── cost-model.js
 │   ├── explain.js
@@ -65,6 +67,8 @@ separate product built on the same Node server. See [Travel Decision Engine](#tr
 │   ├── index.html
 │   ├── travel.css
 │   └── travel.js
+├── investment/                     Investment Intelligence MVP (Company Search + Company Page)
+├── telecom/                        Telecom Optimization MVP (household plan diagnosis)
 ├── index.html                     JTD landing page
 ├── selected-archive/
 │   └── index.html

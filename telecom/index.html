@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="今のスマホ代・回線数・データ使用量を入力するだけで、年間いくら安くできるかを診断する通信費見直しツール。家族分まとめて診断可能。"
+    />
+    <meta name="theme-color" content="#0d2b1e" />
+    <title>通信費見直し診断（MVP） | Japan Talent Desk group</title>
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/telecom/telecom.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">本文へスキップ</a>
+
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="/telecom/">通信費見直し診断（MVP）</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero wrap">
+        <p class="eyebrow">3分で診断</p>
+        <h1>スマホ代、払いすぎてない？<br />家族分まとめて、年間の削減額を診断します。</h1>
+        <p class="lead">
+          今の月額料金・データ使用量・通話の使い方を入力するだけ。主要キャリア・MVNO約25プランの料金データと照らし合わせて、「最安」「バランス重視」「今のキャリアのまま」の3案と、それぞれの年間削減額を計算します。回線を追加すれば、家族全員分をまとめて診断できます。
+        </p>
+      </section>
+
+      <section class="wrap">
+        <form id="telecom-form">
+          <ol class="lines-list" id="lines-list"></ol>
+
+          <div class="form-actions">
+            <button type="button" class="button-secondary" id="add-line">＋ 回線を追加（家族分など）</button>
+            <button type="submit" class="button-primary">診断する</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="wrap" id="status-area" hidden>
+        <div class="notice" id="status-message"></div>
+      </section>
+
+      <section class="wrap" id="result-area" hidden></section>
+
+      <section class="wrap disclaimer">
+        <h2>この診断について</h2>
+        <p class="fine">
+          これは特定の通信会社への加入を勧めるものではありません。表示される料金は主要キャリア・MVNOの公開料金をもとにした手動集計の目安であり、リアルタイムの価格ではありません（<span id="asof-note">データ基準時点は診断結果に表示されます</span>）。家族割・光回線とのセット割・クレジットカード特典・端末残債・キャンペーン割引はこのMVPでは考慮していません。実際の乗り換えの前に、必ず各社の公式サイトで最新の料金・条件をご確認ください。
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p class="fine">通信費見直し診断 — MVP（料金診断のみ。乗り換え手続きの代行は行いません）</p>
+      </div>
+    </footer>
+
+    <script type="module" src="/telecom/telecom.js"></script>
+  </body>
+</html>

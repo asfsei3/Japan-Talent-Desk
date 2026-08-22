@@ -1,0 +1,402 @@
+/*
+ * Telecom Optimization MVP — self-contained styles.
+ *
+ * Same palette/type tokens as investment/investment.css and travel/travel.css
+ * (AI Orchestra design system): deep green for structure, champagne gold for
+ * the primary action, Noto Sans JP for body text with Inter reserved for
+ * numeric figures via the .num marker class.
+ */
+
+:root {
+  --green-980: #0d2b1e;
+  --green-900: #1a4731;
+  --green-820: #143a29;
+  --gold-560: #c9a84c;
+  --cream-100: #f5f0e8;
+  --cream-180: #ece3d2;
+  --ink-980: #0d2b1e;
+  --ink-760: rgba(13, 43, 30, 0.72);
+  --ink-640: rgba(13, 43, 30, 0.55);
+  --loss: #c0392b;
+  --gain: #1e7a4c;
+  --line: rgba(26, 71, 49, 0.12);
+  --white: #ffffff;
+  --shadow-soft: 0 18px 40px rgba(13, 43, 30, 0.1);
+  --font-base: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  --font-en: "Inter", "Noto Sans JP", sans-serif;
+  color-scheme: light;
+  font-family: var(--font-base);
+}
+
+.num {
+  font-family: var(--font-en);
+  font-variant-numeric: tabular-nums;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--cream-100);
+  color: var(--ink-980);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+.wrap {
+  width: min(880px, 100% - 2.5rem);
+  margin-inline: auto;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+}
+
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  background: var(--white);
+  padding: 0.5rem 0.75rem;
+  z-index: 10;
+}
+
+.topbar {
+  background: var(--green-980);
+  color: var(--cream-100);
+  padding: 0.85rem 0;
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--cream-100);
+  letter-spacing: 0.01em;
+}
+
+.hero {
+  padding: 3rem 0 1.5rem;
+}
+
+.eyebrow {
+  color: var(--gold-560);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.4;
+  margin-bottom: 0.9rem;
+}
+
+.lead {
+  color: var(--ink-760);
+  font-size: 1rem;
+  line-height: 1.7;
+  max-width: 64ch;
+}
+
+.lines-list {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.line-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+}
+
+.line-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.line-label {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  padding: 0.3rem 0.1rem;
+  font: inherit;
+  font-weight: 600;
+  background: transparent;
+}
+
+.line-label:focus {
+  outline: none;
+  border-bottom-color: var(--gold-560);
+}
+
+.remove-line {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  width: 1.9rem;
+  height: 1.9rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--ink-640);
+  flex-shrink: 0;
+}
+
+.remove-line:hover:not(:disabled) {
+  border-color: var(--loss);
+  color: var(--loss);
+}
+
+.remove-line:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.line-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+}
+
+.line-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--ink-760);
+}
+
+.line-fields input,
+.line-fields select {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+  font-size: 0.95rem;
+  background: var(--white);
+  color: var(--ink-980);
+}
+
+.line-fields input:focus,
+.line-fields select:focus {
+  outline: 2px solid var(--gold-560);
+  outline-offset: 1px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.button-primary,
+.button-secondary {
+  border-radius: 10px;
+  padding: 0.75rem 1.4rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.button-primary {
+  background: var(--green-900);
+  color: var(--cream-100);
+}
+
+.button-primary:hover {
+  background: var(--green-820);
+}
+
+.button-secondary {
+  background: transparent;
+  color: var(--green-900);
+  border: 1px solid var(--line);
+}
+
+.button-secondary:hover {
+  border-color: var(--gold-560);
+}
+
+.notice {
+  background: var(--cream-180);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  color: var(--ink-760);
+  font-size: 0.92rem;
+  margin-top: 1.5rem;
+}
+
+.notice.error {
+  background: rgba(192, 57, 43, 0.08);
+  color: var(--loss);
+}
+
+#result-area {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.household-summary {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.household-summary h2 {
+  font-size: 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.headline-savings {
+  font-size: 1.3rem;
+  color: var(--green-900);
+}
+
+.headline-savings strong {
+  color: var(--gain);
+  font-size: 1.6rem;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.summary-table th,
+.summary-table td {
+  text-align: left;
+  padding: 0.55rem 0;
+  border-top: 1px solid var(--line);
+  font-weight: 500;
+}
+
+.summary-table td {
+  text-align: right;
+  font-weight: 700;
+}
+
+.summary-table tr.highlight th,
+.summary-table tr.highlight td {
+  color: var(--gain);
+}
+
+.lines-results {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.line-result {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.4rem;
+}
+
+.line-result h3 {
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.picks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.pick {
+  border-top: 3px solid var(--gold-560);
+  padding-top: 0.75rem;
+}
+
+.pick h4 {
+  font-size: 0.85rem;
+  color: var(--ink-640);
+  margin-bottom: 0.4rem;
+}
+
+.pick-plan {
+  font-weight: 700;
+  color: var(--green-900);
+  margin-bottom: 0.3rem;
+}
+
+.pick-price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.pick-savings {
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.pick-savings.positive {
+  color: var(--gain);
+}
+
+.pick-savings.negative {
+  color: var(--loss);
+}
+
+.pick-empty {
+  color: var(--ink-640);
+}
+
+.disclaimer {
+  padding: 2.5rem 0 3rem;
+}
+
+.disclaimer h2 {
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.fine {
+  color: var(--ink-640);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding: 1.5rem 0 2.5rem;
+}

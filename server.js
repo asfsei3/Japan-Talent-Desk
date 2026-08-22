@@ -11,6 +11,7 @@ import {
   planTrip,
 } from "./engine/index.js";
 import { getCompanyPage, searchCompanies } from "./engine/investment/index.js";
+import { diagnose as diagnoseTelecom } from "./engine/telecom/index.js";
 import { checkBasicAuth } from "./src/lib/basic-auth.js";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
@@ -369,6 +370,21 @@ async function handleInvestmentCompany(request, response, ticker) {
   }
 }
 
+async function handleTelecomDiagnose(request, response) {
+  let payload;
+
+  try {
+    const rawBody = await readRequestBody(request);
+    payload = JSON.parse(rawBody || "{}");
+  } catch {
+    sendJson(response, 400, { ok: false, message: "Invalid request body." });
+    return;
+  }
+
+  const result = diagnoseTelecom(payload.lines);
+  sendJson(response, result.ok ? 200 : 400, result);
+}
+
 /**
  * Operator portal: one page linking to every product on this domain plus the
  * sibling Payment Intelligence portal on ai-orchestra, so the one person
@@ -404,6 +420,11 @@ function opsPortalPage() {
       name: "Investment Intelligence（MVP・本番未検証）",
       href: "/investment/",
       note: "企業ファンダメンタルズ検索（SEC EDGAR）。docs/investment/README.md参照",
+    },
+    {
+      name: "通信費見直し診断（MVP）",
+      href: "/telecom/",
+      note: "スマホ代の年間削減額診断（家族分まとめて可）。docs/telecom/README.md参照",
     },
   ];
 
@@ -500,6 +521,14 @@ createServer((request, response) => {
   if (request.method === "GET" && requestPath.startsWith("/api/investment/company/")) {
     const ticker = decodeURIComponent(requestPath.slice("/api/investment/company/".length));
     handleInvestmentCompany(request, response, ticker);
+    return;
+  }
+
+  if (request.method === "POST" && requestPath === "/api/telecom/diagnose") {
+    handleTelecomDiagnose(request, response).catch((error) => {
+      console.error("Telecom diagnosis failed unexpectedly:", error);
+      sendJson(response, 500, { ok: false, message: "Telecom diagnosis failed unexpectedly." });
+    });
     return;
   }
 
